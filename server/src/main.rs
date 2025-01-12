@@ -1,28 +1,44 @@
-use std::{
-    io::{prelude::*, BufReader},
-    net::{TcpListener, TcpStream},
+use axum::{
+    routing::get,
+    Router,
 };
 
-fn main() {
-    let connection_ip = "127.0.0.1";
-    let connection_port = "7878";
-    let listener = TcpListener::bind(connection_ip.to_owned() + ":" + connection_port).unwrap();
-    println!("\nOpen connection on {}:{}", connection_ip, connection_port);
+use std::time::Duration;
+use tokio::task;
 
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
+#[tokio::main]
+async fn main() {
+    // build our application with a single route
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/register-bus", get(register_bus))
+        .route("/get-bus-pos", get(get_bus_pos));
 
-        handle_connection(stream);
-    }
+    // run our app with hyper, listening globally on port 3000
+    let url = "0.0.0.0";
+    let port = "3000";
+    let listener = tokio::net::TcpListener::bind(format!("{}:{}", url, port)).await.unwrap();
+    println!("Server is running on http://{}:{}", url, port);
+    axum::serve(listener, app).await.unwrap();
 }
 
-fn handle_connection(mut stream: TcpStream) {
-    let buf_reader = BufReader::new(&mut stream);
-    let http_request: Vec<_> = buf_reader
-        .lines()
-        .map(|result| result.unwrap())
-        .take_while(|line| !line.is_empty())
-        .collect();
+async fn root() -> &'static str {
+    "Hello, world!"
+}
 
-    println!("Request: {http_request:#?}");
+async fn register_bus() -> &'static str {
+    // Spawn a background task
+    task::spawn(async {
+        for i in 1..=10 {
+            println!("Background task running: iteration {}", i);
+            tokio::time::sleep(Duration::from_secs(1)).await;
+        }
+        println!("Background task completed!");
+    });
+
+    "Register Bus... Background task started!"
+}
+
+async fn get_bus_pos() -> &'static str {
+    "Bus position..."
 }
