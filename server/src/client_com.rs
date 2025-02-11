@@ -1,25 +1,31 @@
 
 use axum::{
   Router,
-  extract::Json,
+  extract::{Json, Query},
   http::StatusCode,
-  response::IntoResponse,
+  response::{IntoResponse, Html},
   routing::{get, post},
 };
 use tokio::task;
 use std::time::Duration;
 use serde_json::{json, Value};
+use serde::Deserialize;
 
+#[derive(Debug, Deserialize)]
 struct GetBusInfoParams {
   id: u32,
 }
 
-/*pub fn routes() -> Router {
-  Router::new().route("/get-bus", post())
+pub fn client_com_routes() -> Router {
+  Router::new()
+      .route("/bus_route", get(request_bus))
+}
 
-  
+async fn request_bus(Query(params): Query<GetBusInfoParams>) -> impl IntoResponse {
 
-}*/
+  let name = params.id;
+  Html(format!("Params: {name}"))
+}
 
 async fn get_bus_info(Json(params): Json<GetBusInfoParams>) -> Json<Value> {
   println!("Received Params: ID = {}", params.id);
