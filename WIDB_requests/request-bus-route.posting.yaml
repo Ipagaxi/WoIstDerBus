@@ -1,0 +1,23 @@
+name: Request Bus Route
+method: POST
+url: http://192.168.178.40/bus_route
+body:
+  content: |-
+    {
+      "arr_station": {
+        "name": "Central Station",
+        "lid": "12345",
+        "type": "bus",
+        "ext_id": "67890"
+      },
+      "des_station": {
+        "name": "Downtown Station",
+        "lid": "54321",
+        "type": "metro",
+        "ext_id": "09876"
+      }
+    }
+  content_type: application/json
+headers:
+- name: Content-Type
+  value: application/json

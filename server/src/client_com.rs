@@ -15,17 +15,27 @@ use crate::{aseag_com, send_get_request};
 
 
 #[derive(Debug, Deserialize)]
-struct GetBusInfoParams {
-  id: u32,
+struct BusRoutePayload {
+  arr_station: StationData,
+  des_station: StationData
+}
+
+#[derive(Debug, Deserialize)]
+struct StationData {
+  name: String,
+  lid: String,
+  #[serde(rename = "type")]
+  station_type: String,
+  ext_id: String
 }
 
 pub fn client_com_routes() -> Router {
   Router::new()
-      .route("/bus_route", get(request_bus))
+      .route("/bus_route", post(request_bus))
 }
 
-async fn request_bus(Query(params): Query<GetBusInfoParams>) -> impl IntoResponse {
-  match aseag_com::load_template_request_body() {
+async fn request_bus(payload: Json<BusRoutePayload>) -> impl IntoResponse {
+  /*match aseag_com::load_template_request_body() {
     Ok(body) => {
       let url = "https://auskunft.avv.de/bin/mgate.exe?rnd=1739272765061";
       match send_get_request(url, body).await {
@@ -36,13 +46,14 @@ async fn request_bus(Query(params): Query<GetBusInfoParams>) -> impl IntoRespons
     Err(err) => {
       println!("{}", err);
     }
-  }
+  }*/
 
-  let name = params.id;
-  Html(format!("Params: {name}"))
+  let arr_name = payload.arr_station.name.clone();
+  let des_name = payload.des_station.name.clone();
+  Html(format!("From {arr_name} to {des_name}"))
 }
 
-async fn get_bus_info(Json(params): Json<GetBusInfoParams>) -> Json<Value> {
+/*async fn get_bus_info(Json(params): Json<GetBusInfoParams>) -> Json<Value> {
   println!("Received Params: ID = {}", params.id);
 
   let body = Json(json!({
@@ -60,4 +71,4 @@ async fn get_bus_info(Json(params): Json<GetBusInfoParams>) -> Json<Value> {
   });
 
   body
-}
+}*/
