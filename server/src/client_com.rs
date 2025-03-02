@@ -11,6 +11,9 @@ use std::time::Duration;
 use serde_json::{json, Value};
 use serde::Deserialize;
 
+use crate::{aseag_com, send_get_request};
+
+
 #[derive(Debug, Deserialize)]
 struct GetBusInfoParams {
   id: u32,
@@ -22,6 +25,18 @@ pub fn client_com_routes() -> Router {
 }
 
 async fn request_bus(Query(params): Query<GetBusInfoParams>) -> impl IntoResponse {
+  println!("REEEEEEE");
+
+  match aseag_com::load_template_request_body() {
+    Ok(body) => {
+      let url = "https://auskunft.avv.de/bin/mgate.exe?rnd=1739272765061";
+      let result = send_get_request(url, body);
+      println!("Result: {:?}", result);
+    },
+    Err(err) => {
+      println!("{}", err);
+    }
+  }
 
   let name = params.id;
   Html(format!("Params: {name}"))
