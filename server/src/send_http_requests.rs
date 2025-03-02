@@ -4,10 +4,10 @@ use reqwest::{Error};
 
 use crate::RequestBody;
 
-pub fn send_get_request(url: &str, body: RequestBody) -> Result<String, Error> {
-    print!("Hallllooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+pub async fn send_get_request(url: &str, body: RequestBody) -> Result<String, Error> {
+    print!("Send request to: {}", url);
 
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     println!("body: {:?}", body);
 
     let response = client.post(url)
@@ -16,7 +16,8 @@ pub fn send_get_request(url: &str, body: RequestBody) -> Result<String, Error> {
         .header("Accept-Language", "en-US,en;q=0.5")
         .header("Content-Type", "application/json")
         .json(&body)
-        .send()?;
+        .send()
+        .await?;
     
-    response.text()
+    response.text().await
 }
