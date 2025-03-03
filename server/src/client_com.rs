@@ -15,21 +15,23 @@ use crate::{aseag_com, send_get_request, Error, Result};
 
 
 #[derive(Debug, Deserialize)]
-struct BusRoutePayload {
-  out_frwd: bool,
-  out_date: Option<String>,
-  out_time: Option<String>,
-  arr_station: StationData,
-  des_station: StationData
+pub struct BusRoutePayload {
+  pub out_frwd: bool,
+  pub out_date: Option<String>,
+  pub out_time: Option<String>,
+  pub arr_station: StationData,
+  pub dep_station: StationData
 }
 
 #[derive(Debug, Deserialize)]
-struct StationData {
-  name: String,
-  lid: String,
+pub struct StationData {
+  pub name: String,
+  pub lid: String,
   #[serde(rename = "type")]
-  station_type: String,
-  ext_id: String
+  pub station_type: String,
+  pub ext_id: String,
+  pub coord_x: u32,
+  pub coord_y: u32
 }
 
 pub fn client_com_routes() -> Router {
@@ -37,31 +39,21 @@ pub fn client_com_routes() -> Router {
       .route("/bus_route", post(request_bus_routes))
 }
 
-async fn request_bus_routes(payload: Json<BusRoutePayload>) -> Result<Json<Value>> {
-  /*match aseag_com::load_template_request_body() {
-    Ok(body) => {
-      let url = "https://auskunft.avv.de/bin/mgate.exe?rnd=1739272765061";
-      match send_get_request(url, body).await {
-        Ok(result) => println!("Result: {:?}", result),
-        Err(err) => println!("Error: {}", err),
-    }
+async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> Result<Json<Value>> {
+  let url = "https://auskunft.avv.de/bin/mgate.exe?rnd=1739272765061";
+  let body = aseag_com::construct_bus_route_request_body(payload);
+  match send_get_request(url, body).await {
+    Ok(result) => {
+      let response = Json(json!(
+        result
+      ));
+      Ok(response)
     },
     Err(err) => {
-      println!("{}", err);
+      println!("Error: {}", err);
+      Err(Error::RequestFail)
     }
-  }*/
-
-  let arr_name = payload.arr_station.name.clone();
-  let des_name = payload.des_station.name.clone();
-
-  let body = Json(json!({
-    "response": {
-      "success": true,
-      "arr_name": arr_name,
-      "des_name": des_name
-    }
-  }));
-  Ok(body)
+  }
 }
 
 /*async fn get_bus_info(Json(params): Json<GetBusInfoParams>) -> Json<Value> {
