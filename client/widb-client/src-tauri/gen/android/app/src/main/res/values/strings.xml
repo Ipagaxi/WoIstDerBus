@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">widb-client</string>
+    <string name="main_activity_title">widb-client</string>
+</resources>
