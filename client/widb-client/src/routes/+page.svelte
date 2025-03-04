@@ -1,31 +1,81 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { onMount } from 'svelte';
+  import L, { type LeafletEvent } from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+  import {
+    checkPermissions,
+    requestPermissions,
+    getCurrentPosition,
+    watchPosition
+  } from '@tauri-apps/plugin-geolocation'
 
   let name = "";
   let greetMsg = "";
 
+  let map;
+  let userMarker;
+  let pos = { latitude: 0, longitude: 0 };  // Global variable to store position
+
+  async function getLocation() {
+    try {
+      let permissions = await checkPermissions();
+
+      if (
+        permissions.location === 'prompt' ||
+        permissions.location === 'prompt-with-rationale'
+      ) {
+        permissions = await requestPermissions(['location']);
+      }
+
+      if (permissions.location === 'granted') {
+        // Get current position
+        let position = await getCurrentPosition();
+        pos = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+        console.log('Current Position:', pos);
+
+        // Watch for location updates
+        await watchPosition(
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+          (pos) => {
+            console.log('Updated Position:', pos);
+          }
+        );
+      } else {
+        console.error('Location permission denied');
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+    }
+  }
+
+  onMount(() => {
+
+    getLocation()
+
+    // Initialize the map with a temporary center
+    map = L.map('map').setView([0, 0], 13);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+  });
+
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    greetMsg = await invoke("greet", { name });
+    greetMsg = await invoke("greet", { pos });
   }
 </script>
 
 <div class="container">
   <h1>Welcome to Tauri!</h1>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
-
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
+  <div id="map"></div>
 
   <form class="row" on:submit|preventDefault={greet}>
     <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
@@ -36,6 +86,8 @@
 </div>
 
 <style>
+  #map { height: 180px; }
+
   .logo.vite:hover {
     filter: drop-shadow(0 0 2em #747bff);
   }

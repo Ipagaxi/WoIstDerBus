@@ -13,7 +13,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@tauri-apps/api": "^2.0.0"
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-geolocation": "^2.2.3",
+    "@types/leaflet": "^1.9.16",
+    "internal-ip": "^8.0.0",
+    "leaflet": "^1.9.4"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.1",

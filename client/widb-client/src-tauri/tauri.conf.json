@@ -23,7 +23,7 @@
   "plugins": {},
   "app": {
     "security": {
-      "csp": null
+      "csp": "default-src 'self' https://{s}.tile.openstreetmap.org; img-src 'self' data: https://{s}.tile.openstreetmap.org"
     },
     "windows": [
       {
