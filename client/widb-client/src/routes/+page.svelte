@@ -14,12 +14,13 @@
     watchPosition
   } from '@tauri-apps/plugin-geolocation'
 
-  let name = "";
+  let name1 = "";
   let greetMsg = "";
 
   let map;
   let userMarker;
-  let pos = { latitude: 0, longitude: 0 };  // Global variable to store position
+  let pos = "";  // Global variable to store position
+  let coords = { x: 0, y: 0}
 
   async function getLocation() {
     try {
@@ -35,7 +36,8 @@
       if (permissions.location === 'granted') {
         // Get current position
         let position = await getCurrentPosition();
-        pos = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+        pos = "" + position.coords.latitude + "" + position.coords.longitude;
+        coords = { x: position.coords.latitude, y: position.coords.longitude};
         console.log('Current Position:', pos);
 
         // Watch for location updates
@@ -58,7 +60,7 @@
     getLocation()
 
     // Initialize the map with a temporary center
-    map = L.map('map').setView([0, 0], 13);
+    map = L.map('map').setView([coords.x, coords.y], 13);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -66,7 +68,13 @@
     }).addTo(map);
   });
 
+  function update_position() {
+    getLocation()
+    map = L.map('map').setView([coords.x, coords.y], 13);
+  }
+
   async function greet() {
+    getLocation()
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     greetMsg = await invoke("greet", { pos });
   }
@@ -77,8 +85,13 @@
 
   <div id="map"></div>
 
+  <button on:click="{getLocation}">
+    Update position
+  </button>
+
+
   <form class="row" on:submit|preventDefault={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
+    <input id="greet-input" placeholder="Enter a name..." bind:value={name1} />
     <button type="submit">Greet</button>
   </form>
 
