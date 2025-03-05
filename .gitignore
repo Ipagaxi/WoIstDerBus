@@ -2,3 +2,5 @@ server/debug/
 server/target/
 
 server/Cargo.lock
+
+client/widb-client//src-tauri/gen/android/keystore.properties
