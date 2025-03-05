@@ -20,7 +20,7 @@
   let map;
   let userMarker;
   let pos = "";  // Global variable to store position
-  let coords = { x: 0, y: 0}
+  let coords = { x: 0, y: 0};
 
   async function getLocation() {
     try {
@@ -60,7 +60,7 @@
     getLocation()
 
     // Initialize the map with a temporary center
-    map = L.map('map').setView([coords.x, coords.y], 13);
+    map = L.map('map').setView([coords.x, coords.y], 16);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -88,7 +88,8 @@
   <button on:click="{getLocation}">
     Update position
   </button>
-
+  Position (string): { pos }
+  Position (struct): { coords.x } { coords.y}
 
   <form class="row" on:submit|preventDefault={greet}>
     <input id="greet-input" placeholder="Enter a name..." bind:value={name1} />
