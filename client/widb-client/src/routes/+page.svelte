@@ -60,7 +60,7 @@
     getLocation()
 
     // Initialize the map with a temporary center
-    map = L.map('map').setView([coords.x, coords.y], 16);
+    map = L.map('map').setView([50.0, 6.0], 16);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
