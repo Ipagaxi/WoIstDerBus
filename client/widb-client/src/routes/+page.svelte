@@ -70,7 +70,7 @@
 
   function update_position() {
     getLocation()
-    map = L.map('map').setView([coords.x, coords.y], 13);
+    map.setView([coords.x, coords.y], 13);
   }
 
   async function greet() {
@@ -85,7 +85,7 @@
 
   <div id="map"></div>
 
-  <button on:click="{getLocation}">
+  <button on:click="{update_position}">
     Update position
   </button>
   Position (string): { pos }
