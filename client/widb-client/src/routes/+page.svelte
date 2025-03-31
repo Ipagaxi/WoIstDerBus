@@ -14,46 +14,12 @@
     watchPosition
   } from '@tauri-apps/plugin-geolocation'
 
-  let name1 = "";
+  import { coords, getLocation } from '$lib/utils.ts';
+
   let greetMsg = "";
 
   let map;
   let userMarker;
-  let pos = "";  // Global variable to store position
-  let coords = { x: 0, y: 0};
-
-  async function getLocation() {
-    try {
-      let permissions = await checkPermissions();
-
-      if (
-        permissions.location === 'prompt' ||
-        permissions.location === 'prompt-with-rationale'
-      ) {
-        permissions = await requestPermissions(['location']);
-      }
-
-      if (permissions.location === 'granted') {
-        // Get current position
-        let position = await getCurrentPosition();
-        pos = "" + position.coords.latitude + "" + position.coords.longitude;
-        coords = { x: position.coords.latitude, y: position.coords.longitude};
-        console.log('Current Position:', pos);
-
-        // Watch for location updates
-        await watchPosition(
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-          (pos) => {
-            console.log('Updated Position:', pos);
-          }
-        );
-      } else {
-        console.error('Location permission denied');
-      }
-    } catch (error) {
-      console.error('Error getting location:', error);
-    }
-  }
 
   onMount(() => {
 
@@ -69,14 +35,9 @@
   });
 
   function update_position() {
-    getLocation()
+    console.log("coords", coords);
+    getLocation();
     map.setView([coords.x, coords.y], 13);
-  }
-
-  async function greet() {
-    getLocation()
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    greetMsg = await invoke("greet", { pos });
   }
 </script>
 
@@ -88,15 +49,7 @@
   <button on:click="{update_position}">
     Update position
   </button>
-  Position (string): { pos }
-  Position (struct): { coords.x } { coords.y}
-
-  <form class="row" on:submit|preventDefault={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name1} />
-    <button type="submit">Greet</button>
-  </form>
-
-  <p>{greetMsg}</p>
+  Pos: { coords.x }, { coords.y }
 </div>
 
 <style>
