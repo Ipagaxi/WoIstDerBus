@@ -15,6 +15,7 @@
   } from '@tauri-apps/plugin-geolocation'
 
   import { coords, getLocation } from '$lib/utils.ts';
+  import BusRoutes from "./BusRoutes.svelte";
 
   let greetMsg = "";
 
@@ -50,6 +51,7 @@
     Update position
   </button>
   Pos: { coords.x }, { coords.y }
+  <BusRoutes/>
 </div>
 
 <style>

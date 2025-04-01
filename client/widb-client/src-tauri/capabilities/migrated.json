@@ -12,6 +12,11 @@
     "geolocation:allow-check-permissions",
     "geolocation:allow-request-permissions",
     "geolocation:allow-get-current-position",
-    "geolocation:allow-watch-position"
+    "geolocation:allow-watch-position",
+    "http:default",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "http://127.0.0.1:3000/bus_route" }]
+    }
   ]
 }
