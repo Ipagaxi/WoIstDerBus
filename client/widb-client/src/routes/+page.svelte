@@ -3,9 +3,10 @@
      crossorigin=""/>
 
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from 'svelte';
-  import L, { type LeafletEvent } from 'leaflet';
+  import L, { circle, type LeafletEvent } from 'leaflet';
   import 'leaflet/dist/leaflet.css';
   import {
     checkPermissions,
@@ -14,13 +15,14 @@
     watchPosition
   } from '@tauri-apps/plugin-geolocation'
 
-  import { coords, getLocation } from '$lib/utils.ts';
+  import { coords, getLocation, getBusRoute, bus_position } from '$lib/utils.ts';
   import BusRoutes from "./BusRoutes.svelte";
 
   let greetMsg = "";
 
   let map;
   let userMarker;
+  let bus_circle;
 
   onMount(() => {
 
@@ -28,6 +30,14 @@
 
     // Initialize the map with a temporary center
     map = L.map('map').setView([50.0, 6.0], 16);
+
+    bus_circle = L.circle([50.0, 6.0], {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 500
+    }).addTo(map);
+
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -40,6 +50,16 @@
     getLocation();
     map.setView([coords.x, coords.y], 13);
   }
+
+  const interval = setInterval(() => {
+    getBusRoute();
+    bus_circle.setLatLng(bus_position.x, bus_position.y)
+  }, 5000);
+
+  // Clean up when the component is destroyed
+  onDestroy(() => {
+    clearInterval(interval);
+  });
 </script>
 
 <div class="container">
@@ -51,6 +71,7 @@
     Update position
   </button>
   Pos: { coords.x }, { coords.y }
+  Bus Position: { bus_position.x }, { bus_position.y }
   <BusRoutes/>
 </div>
 
