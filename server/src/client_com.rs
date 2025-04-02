@@ -12,6 +12,7 @@ use serde_json::{json, Value};
 use serde::Deserialize;
 
 use crate::{aseag_com, send_get_request, Error, Result};
+use crate::util_json;
 
 
 #[derive(Debug, Deserialize)]
@@ -45,7 +46,7 @@ async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> Result<Json
   match send_get_request(url, body).await {
     Ok(result) => {
       let response = Json(json!(
-        result
+        util_json::get_infos_of_all_busses_for_route(&result)
       ));
       Ok(response)
     },

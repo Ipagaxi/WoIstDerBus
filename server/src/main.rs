@@ -8,11 +8,13 @@ pub use self::error::{Error, Result};
 pub mod client_com;
 pub mod aseag_com;
 pub mod send_http_requests;
+pub mod util_json;
 mod error;
 
 use crate::client_com::*;
 use crate::aseag_com::*;
 use crate::send_http_requests::*;
+use crate::util_json::*;
 
 #[derive(Debug, Deserialize)]
 struct Params {
