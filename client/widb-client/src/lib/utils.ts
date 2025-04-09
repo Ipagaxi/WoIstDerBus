@@ -92,9 +92,10 @@ export async function getBusRoute() {
     resp_status = response.status;
     const position_data = (await response.json()) as GetPositionResponse;
     console.log("Bus data", position_data);
-    bus_position.x = position_data.data[0].x;
-    bus_position.y = position_data.data[0].y;
-    resp = position_data.data[0].x + ", " + position_data.data[0].y;
+    bus_position.y = Math.trunc(position_data[0].x / 10000)/100;
+    bus_position.x = Math.trunc(position_data[0].y / 10000)/100;
+    console.log("Bus position (request): ", bus_position);
+    resp = bus_position.x + ", " + bus_position.y;
     console.log(response.status); // e.g. 200
     console.log(response.statusText); // e.g. "OK"
   } catch (error) {

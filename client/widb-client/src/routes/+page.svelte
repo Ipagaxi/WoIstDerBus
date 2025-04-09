@@ -35,7 +35,7 @@
       color: 'red',
       fillColor: '#f03',
       fillOpacity: 0.5,
-      radius: 500
+      radius: 50
     }).addTo(map);
 
 
@@ -48,12 +48,14 @@
   function update_position() {
     console.log("coords", coords);
     getLocation();
-    map.setView([coords.x, coords.y], 13);
+    map.panTo([coords.x, coords.y]);
   }
 
   const interval = setInterval(() => {
     getBusRoute();
-    bus_circle.setLatLng(bus_position.x, bus_position.y)
+    console.log("bus positions (for circle): ", bus_position);
+    map.panTo([bus_position.x, bus_position.y]);
+    bus_circle.setLatLng([bus_position.x, bus_position.y]);
   }, 5000);
 
   // Clean up when the component is destroyed
