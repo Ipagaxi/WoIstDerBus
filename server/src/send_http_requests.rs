@@ -5,10 +5,8 @@ use reqwest::{Error};
 use crate::RequestBody;
 
 pub async fn send_get_request(url: &str, body: RequestBody) -> Result<String, Error> {
-    print!("Send request to: {}", url);
 
     let client = reqwest::Client::new();
-    println!("body: {:?}", body);
 
     let response = client.post(url)
         .header("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0")
