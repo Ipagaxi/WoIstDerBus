@@ -23,7 +23,7 @@
   "plugins": {},
   "app": {
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://*.tile.openstreetmap.org https://*.tile.leafletjs.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.tile.leafletjs.com;"
+      "csp": "default-src 'self'; connect-src 'self' https://*.tile.openstreetmap.org https://*.tile.leafletjs.com http://192.168.178.41:3000; img-src 'self' data: https://*.tile.openstreetmap.org https://*.tile.leafletjs.com;"
     },
     "windows": [
       {

@@ -18,7 +18,7 @@
   import { coords, getLocation, getBusRoute, bus_position } from '$lib/utils.ts';
   import BusRoutes from "./BusRoutes.svelte";
 
-  let greetMsg = "";
+  let log = "";
 
   let map;
   let userMarker;
@@ -46,13 +46,16 @@
   });
 
   function update_position() {
+    invoke('frontend_log', { message: '' + bus_position.x });
     console.log("coords", coords);
     getLocation();
     map.panTo([coords.x, coords.y]);
   }
 
-  const interval = setInterval(() => {
-    getBusRoute();
+  const interval = setInterval(async () => {
+    const result = await getBusRoute();
+    log = result;
+    invoke('frontend_log', { message: '' + result});
     console.log("bus positions (for circle): ", bus_position);
     map.panTo([bus_position.x, bus_position.y]);
     bus_circle.setLatLng([bus_position.x, bus_position.y]);
@@ -75,6 +78,7 @@
   Pos: { coords.x }, { coords.y }
   Bus Position: { bus_position.x }, { bus_position.y }
   <BusRoutes/>
+  Log { log }
 </div>
 
 <style>

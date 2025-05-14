@@ -6,17 +6,20 @@ import {
   watchPosition
 } from '@tauri-apps/plugin-geolocation'
 
+import { invoke } from '@tauri-apps/api/core';
+import { fetch } from '@tauri-apps/plugin-http';
+
 let resp = 'None';
 let resp_status = 0;
 
-  type Position = {
-    x: number;
-    y: number;
-  }
+type Position = {
+  x: number;
+  y: number;
+}
 
-  type GetPositionResponse = {
-    data: Position[];
-  }
+type GetPositionResponse = {
+  data: Position[];
+}
 
 export let bus_position = { x: 0, y: 0}
 
@@ -80,25 +83,43 @@ export async function getBusRoute() {
         "coord_y": 50776477
       }
     }`
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: request_data
-    });
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: request_data
+      });
+      
+      resp_status = response.status;
+      
+      if (!response.ok) {
+        // Try to get the error details from the response body
+        let errorBody;
+        try {
+          errorBody = await response.json();
+          // Return the specific error message from the API if available
+          return `Request failed (${response.status}): ${JSON.stringify(errorBody)}`;
+        } catch {
+          // If response is not JSON, get it as text
+          errorBody = await response.text();
+          return `Request failed (${response.status}): ${errorBody}`;
+        }
+      }
+      
+      const position_data = (await response.json()) as GetPositionResponse;
+      console.log("Bus data", position_data);
+      invoke('frontend_log', { message: 'Hello!' });
+      bus_position.y = Math.trunc(position_data[0].x / 10000)/100;
+      bus_position.x = Math.trunc(position_data[0].y / 10000)/100;
+      console.log("Bus position (request): ", bus_position);
+      resp = bus_position.x + ", " + bus_position.y;
+      console.log(response.status); // e.g. 200
+      console.log(response.statusText); // e.g. "OK"
+      return "" + position_data;
+      
+    } catch (error) {
+        // Handle network errors, CORS issues, etc.
+        // Return the actual error name and message
+        return `Network error: ${error.name} - ${error.message}`;
     }
-    resp_status = response.status;
-    const position_data = (await response.json()) as GetPositionResponse;
-    console.log("Bus data", position_data);
-    bus_position.y = Math.trunc(position_data[0].x / 10000)/100;
-    bus_position.x = Math.trunc(position_data[0].y / 10000)/100;
-    console.log("Bus position (request): ", bus_position);
-    resp = bus_position.x + ", " + bus_position.y;
-    console.log(response.status); // e.g. 200
-    console.log(response.statusText); // e.g. "OK"
-  } catch (error) {
-    console.error("Error: ", error);
-  }
 }
