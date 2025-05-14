@@ -12,12 +12,12 @@ import { fetch } from '@tauri-apps/plugin-http';
 let resp = 'None';
 let resp_status = 0;
 
-type Position = {
+export type Position = {
   x: number;
   y: number;
 }
 
-type GetPositionResponse = {
+export type GetPositionResponse = {
   data: Position[];
 }
 
@@ -115,7 +115,7 @@ export async function getBusRoute() {
       resp = bus_position.x + ", " + bus_position.y;
       console.log(response.status); // e.g. 200
       console.log(response.statusText); // e.g. "OK"
-      return "" + position_data;
+      return position_data;
       
     } catch (error) {
         // Handle network errors, CORS issues, etc.

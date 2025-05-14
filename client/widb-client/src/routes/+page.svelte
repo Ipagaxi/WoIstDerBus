@@ -16,6 +16,7 @@
   } from '@tauri-apps/plugin-geolocation'
 
   import { coords, getLocation, getBusRoute, bus_position } from '$lib/utils.ts';
+  import { type GetPositionResponse, type Position } from '$lib/utils.ts';
   import BusRoutes from "./BusRoutes.svelte";
 
   let log = "";
@@ -53,10 +54,13 @@
   }
 
   const interval = setInterval(async () => {
-    const result = await getBusRoute();
-    log = result;
+    const result = await getBusRoute() as GetPositionResponse;
+    log = ""
+    result.forEach(element => {
+      log += "x: " + Math.trunc(element.x / 10000)/100 + ", y: " + Math.trunc(element.y / 10000)/100 + "\n";
+    });
+    
     invoke('frontend_log', { message: '' + result});
-    console.log("bus positions (for circle): ", bus_position);
     map.panTo([bus_position.x, bus_position.y]);
     bus_circle.setLatLng([bus_position.x, bus_position.y]);
   }, 5000);
@@ -75,10 +79,8 @@
   <button on:click="{update_position}">
     Update position
   </button>
-  Pos: { coords.x }, { coords.y }
-  Bus Position: { bus_position.x }, { bus_position.y }
   <BusRoutes/>
-  Log { log }
+  <pre>Log: {log}</pre>
 </div>
 
 <style>
