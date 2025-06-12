@@ -12,13 +12,18 @@ import { fetch } from '@tauri-apps/plugin-http';
 let resp = 'None';
 let resp_status = 0;
 
+export type BusData = {
+  pos: Position;
+  number: String;
+}
+
 export type Position = {
   x: number;
   y: number;
 }
 
-export type GetPositionResponse = {
-  data: Position[];
+export type GetBusDataResponse = {
+  data: BusData[];
 }
 
 export let bus_position = { x: 0, y: 0}
@@ -68,19 +73,19 @@ export async function getBusRoute() {
       "out_frwd": true,
       "arr_station": {
         "name": "Halifaxstraße",
-        "lid": "A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1739229385@",
-        "type": "S",
+        "lid": "A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1749593764@i=A×de:05334:1427@",
+        "type": "A",
         "ext_id": "1427",
         "coord_x": 6058001,
         "coord_y": 50779534
       },
       "dep_station": {
-        "name": "Bushof, AC",
-        "lid": "A=1@O=Bushof, AC@X=6089661@Y=50776477@U=80@L=1001@B=1@p=1740697285@",
-        "type": "S",
-        "ext_id": "1001",
-        "coord_x": 6089661,
-        "coord_y": 50776477
+        "name": "Ponttor, AC",
+        "lid": "A=1@O=Ponttor, AC@X=6077841@Y=50781709@U=80@L=1055@B=1@p=1749593764@i=A×de:05334:1055@",
+        "type": "A",
+        "ext_id": "1055",
+        "coord_x": 6077841,
+        "coord_y": 50781709
       }
     }`
     try {
@@ -106,16 +111,16 @@ export async function getBusRoute() {
         }
       }
       
-      const position_data = (await response.json()) as GetPositionResponse;
-      console.log("Bus data", position_data);
+      const bus_data = (await response.json()) as GetBusDataResponse;
+      console.log("Bus data", bus_data);
       invoke('frontend_log', { message: 'Hello!' });
-      bus_position.y = Math.trunc(position_data[0].x / 10000)/100;
-      bus_position.x = Math.trunc(position_data[0].y / 10000)/100;
+      bus_position.y = Math.trunc(bus_data[0].x / 1)/1000000;
+      bus_position.x = Math.trunc(bus_data[0].y / 1)/1000000;
       console.log("Bus position (request): ", bus_position);
       resp = bus_position.x + ", " + bus_position.y;
       console.log(response.status); // e.g. 200
       console.log(response.statusText); // e.g. "OK"
-      return position_data;
+      return bus_data;
       
     } catch (error) {
         // Handle network errors, CORS issues, etc.

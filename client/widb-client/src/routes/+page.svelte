@@ -57,7 +57,7 @@
     const result = await getBusRoute() as GetPositionResponse;
     log = ""
     result.forEach(element => {
-      log += "x: " + Math.trunc(element.x / 10000)/100 + ", y: " + Math.trunc(element.y / 10000)/100 + "\n";
+      log += Math.trunc(element.x / 1)/1000000 + ", " + Math.trunc(element.y / 1)/1000000 + "\n";
     });
     
     invoke('frontend_log', { message: '' + result});
