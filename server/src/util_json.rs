@@ -1,10 +1,52 @@
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)] 
 pub struct BusPosition {
   x: u32,
   y: u32
+}
+
+pub fn get_value_by_path<'a>(json_data: &'a Value, path: &str) -> Option<&'a Value> {
+    let mut current = json_data;
+    for segment in path.split('.') {
+        // Check if the segment contains array indexing like "foo[2]"
+        if let Some((key, index_str)) = segment.split_once('[') {
+            // Navigate into the object
+            match current.get(key) {
+              Some(value) => {
+                println!("Value: {:?}", value);
+                current = value;
+              },
+              None => {
+                return None
+              }
+            }
+            // Navigate into the array
+            let index = index_str.trim_end_matches(']').parse::<usize>().ok();
+            match current.get(index.unwrap_or(0)) {
+              Some (value) => {
+                println!("Value: {:?}", value);
+                current = value;
+              },
+              None => {
+                return None
+              }
+            }
+        } else {
+            // Just a regular key
+            match current.get(segment) {
+              Some(value) => {
+                println!("Value: {:?}", value);
+                current = value;
+              },
+              None => {
+                return None
+              }
+            }
+        }
+    }
+    Some(current)
 }
 
 pub fn get_infos_of_all_busses_for_route(json_data: &str) -> Vec<BusPosition> {

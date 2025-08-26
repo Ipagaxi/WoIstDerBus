@@ -1,17 +1,14 @@
 
 use axum::{
   Router,
-  extract::{Json, Query},
-  http::StatusCode,
-  response::{IntoResponse, Html},
-  routing::{get, post},
+  extract::{Json},
+  routing::{post},
 };
-use tokio::task;
-use std::time::Duration;
+
 use serde_json::{json, Value};
 use serde::Deserialize;
 
-use crate::{aseag_com, send_get_request, Error, Result};
+use crate::{aseag_com, send_http_requests, error};
 use crate::util_json;
 
 
@@ -40,10 +37,10 @@ pub fn client_com_routes() -> Router {
       .route("/bus_route", post(request_bus_routes))
 }
 
-async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> Result<Json<Value>> {
+async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> error::Result<Json<Value>> {
   let url = "https://auskunft.avv.de/bin/mgate.exe?rnd=1739272765061";
   let body = aseag_com::construct_bus_route_request_body(payload);
-  match send_get_request(url, body).await {
+  match send_http_requests::send_get_request(url, body).await {
     Ok(result) => {
       let response = Json(json!(
         util_json::get_infos_of_all_busses_for_route(&result)
@@ -52,7 +49,7 @@ async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> Result<Json
     },
     Err(err) => {
       println!("Error: {}", err);
-      Err(Error::RequestFail)
+      Err(error::Error::RequestFail)
     }
   }
 }

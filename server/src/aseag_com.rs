@@ -1,5 +1,3 @@
-use std::{fmt::format, ops::Bound};
-
 use serde::{Serialize, Deserialize};
 
 use crate::client_com;
@@ -7,6 +5,7 @@ use crate::client_com;
 const JSON_BODY_EXAMPLE: &str = r#"{"id":"t5m4vn8qkw8iy44k","ver":"1.69","lang":"deu","auth":{"type":"AID","aid":"4vV1PaulHallo511icH"},"client":{"id":"AVV_AACHEN","type":"WEB","name":"webapp","l":"vs_aseag","v":20500},"formatted":false,"svcReqL":[{"meth":"TripSearch","req":{"jnyFltrL":[{"type":"GROUP","mode":"INC","value":"OEV"},{"type":"META","mode":"INC","meta":"notBarrierfree"},{"type":"PROD","mode":"INC","value":2033}],"getPolyline":true,"getPasslist":true,"gisFltrL":[{"type":"P","mode":"FB","profile":{"type":"F","maxdist":"2000"}},{"type":"M","mode":"FBT","meta":"foot_speed_normal"},{"type":"P","mode":"FB","profile":{"type":"B","maxdist":"5000"}},{"type":"M","mode":"FBT","meta":"bike_speed_normal"},{"type":"M","mode":"FBT","meta":"car_speed_normal"}],"depLocL":[{"lid":"A=1@O=Driescher Gässchen (RWTH Aachen), AC@X=6081805@Y=50779246@U=80@L=1027@B=1@p=1739229385@","name":"Driescher Gässchen (RWTH Aachen), AC","globalIdL":[{"id":"de:05334:1027","type":"A"}],"eteId":"dep_0|S|Driescher Gässchen (RWTH Aachen), AC|1027|6081805|50779246"}],"arrLocL":[{"lid":"A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1739229385@","name":"Halifaxstraße","globalIdL":[{"id":"de:05334:1427","type":"A"}],"eteId":"arr_0|S|Halifaxstraße|1427|6058001|50779534"}],"outFrwd":true,"outTime":"121000","outDate":"20250211","liveSearch":false,"maxChg":"1000","minChgTime":"-1"},"id":"1|25|"}]}"#;
 
 #[derive(Debug, Serialize, Deserialize)]
+
 pub struct RequestBody {
     id: String,
     ver: String,

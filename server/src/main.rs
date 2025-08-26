@@ -1,21 +1,12 @@
 use axum::{
-    extract::Query, handler, response::{Html, IntoResponse}, routing::{get, post}, Router
+    Router
 };
 use serde::Deserialize;
 use tower_http::cors::{Any, CorsLayer};
 
-pub use self::error::{Error, Result};
+pub use server::error::{Error, Result};
 
-pub mod client_com;
-pub mod aseag_com;
-pub mod send_http_requests;
-pub mod util_json;
-mod error;
-
-use crate::client_com::*;
-use crate::aseag_com::*;
-use crate::send_http_requests::*;
-use crate::util_json::*;
+use server::client_com;
 
 #[derive(Debug, Deserialize)]
 struct Params {
@@ -30,7 +21,7 @@ async fn main() {
         .allow_headers(Any);
 
     let routes_all = Router::new()
-        .merge(client_com_routes())
+        .merge(client_com::client_com_routes())
         .layer(cors);
 
     let url = "0.0.0.0";

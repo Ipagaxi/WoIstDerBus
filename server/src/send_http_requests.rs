@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-
 use reqwest::{Error};
 
-use crate::RequestBody;
+use crate::aseag_com;
 
-pub async fn send_get_request(url: &str, body: RequestBody) -> Result<String, Error> {
+pub async fn send_get_request(url: &str, body: aseag_com::RequestBody) -> Result<String, Error> {
 
     let client = reqwest::Client::new();
 
