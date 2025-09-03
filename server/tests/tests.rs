@@ -12,7 +12,7 @@ mod tests {
 
 use super::*;
 
-  /*#[test]
+  #[test]
   fn test_get_value_from_json() {
     match fs::read_to_string("tests/BusDataJson.json") {
       Ok(json_data) => {
@@ -26,14 +26,14 @@ use super::*;
         println!("Could not read 'example.json'! ({:?})", why);
       },
     }
-  }*/
+  }
 
   #[test]
   fn test_get_mult_value_from_json() {
     match fs::read_to_string("tests/BusDataJson.json") {
       Ok(json_data) => {
         let parsed_json: Value = serde_json::from_str(&json_data).expect("Failed to parse JSON");
-        let path_string = vec!["svcResL[0]", "res", "outConL", "secL[1]", "jny", "pos"];
+        let path_string = vec!["svcResL", "res", "outConL", "secL", "jny", "pos"];
         let result = util_json::get_value_by_path(&parsed_json, &path_string);
         println!("result: {:?}", result);
         assert_eq!(*result[0], json!({"x": 6063026, "y": 50769978}));

@@ -11,16 +11,10 @@ pub struct BusPosition {
 pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a Value> {
     let mut current = json_data;
     let mut positions: Vec<&Value> = Vec::new();
-    for i in 0..path.len() {
-        println!("{:?}", &path);
-        let json_str = serde_json::to_string_pretty(&current).unwrap();
-
-            // Write to file
-            //fs::write(format!("current_{i}.json"), json_str);
+    for mut i in 0..path.len() {
         // Check if the segment contains array indexing like "foo[2]"
         if let Some((key, index_str)) = &path[i].split_once('[') {
             // Navigate into the object
-            
             match current.get(key) {
               Some(value) => {
                 current = value;
@@ -41,6 +35,7 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
             }
         } else {
             // Just a regular key
+
             match current.get(&path[i]) {
               Some(value) => {
                 // If an index is not specified => go through every
@@ -49,6 +44,8 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
                     for element in arr {
                       positions.append(&mut get_value_by_path(element, &path[i+1..].to_vec()));
                     }
+                    i = path.len();
+
                   } else {
                     current = value;
                   } 
@@ -63,7 +60,6 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
         }
     }
     positions.push(current);
-    println!("current: {:?}", current);
     positions
 }
 
