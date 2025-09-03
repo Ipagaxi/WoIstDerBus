@@ -1,5 +1,6 @@
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
+use std::fs;
 
 #[derive(Debug, Serialize, Deserialize)] 
 pub struct BusPosition {
@@ -7,47 +8,69 @@ pub struct BusPosition {
   y: u32
 }
 
-pub fn get_value_by_path<'a>(json_data: &'a Value, path: &str) -> Option<&'a Value> {
+pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a Value> {
     let mut current = json_data;
-    for segment in path.split('.') {
+    let mut positions: Vec<&Value> = Vec::new();
+    for i in 0..path.len() {
+        println!("{:?}", &path);
+        let json_str = serde_json::to_string_pretty(&current).unwrap();
+
+            // Write to file
+            //fs::write(format!("current_{i}.json"), json_str);
         // Check if the segment contains array indexing like "foo[2]"
-        if let Some((key, index_str)) = segment.split_once('[') {
+        if let Some((key, index_str)) = &path[i].split_once('[') {
             // Navigate into the object
+            
             match current.get(key) {
               Some(value) => {
-                println!("Value: {:?}", value);
                 current = value;
               },
               None => {
-                return None
+                return positions
               }
             }
             // Navigate into the array
             let index = index_str.trim_end_matches(']').parse::<usize>().ok();
             match current.get(index.unwrap_or(0)) {
               Some (value) => {
-                println!("Value: {:?}", value);
                 current = value;
               },
               None => {
-                return None
+                return positions
               }
             }
         } else {
             // Just a regular key
-            match current.get(segment) {
+            match current.get(&path[i]) {
               Some(value) => {
-                println!("Value: {:?}", value);
-                current = value;
+                // If an index is not specified => go through every
+                if i+1 < path.len() {
+                  if let Some(arr) = value.as_array() {
+                    for element in arr {
+                      positions.append(&mut get_value_by_path(element, &path[i+1..].to_vec()));
+                    }
+                  } else {
+                    current = value;
+                  } 
+                } else {
+                  current = value;
+                }
               },
               None => {
-                return None
+                return positions
               }
             }
         }
     }
-    Some(current)
+    positions.push(current);
+    println!("current: {:?}", current);
+    positions
 }
+
+/*pub fn get_infos_of_all_busses_for_route<'a>(json_data: &'a Value) -> BusPosition {
+
+  let result = get_value_by_path(json_data, path)
+}*/
 
 pub fn get_infos_of_all_busses_for_route(json_data: &str) -> Vec<BusPosition> {
 

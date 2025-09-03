@@ -228,7 +228,6 @@ pub fn construct_bus_route_request_body(bus_route_spec: client_com::BusRoutePayl
 }
 
 pub fn load_template_request_body() -> Result<RequestBody, serde_json::Error> {
-    print!("start loading");
     let request_body: RequestBody = serde_json::from_str(JSON_BODY_EXAMPLE)?;
     Ok(request_body)
 }
