@@ -72,15 +72,13 @@ use super::*;
     let body = aseag_com::construct_bus_route_request_body(payload);
     match send_http_requests::send_get_request(url, body).await {
       Ok(result) => {
-        //fs::write("BusDataJson.json", result);
-        /*let response = Json(json!(
+        let response = Json(json!(
           util_json::get_infos_of_all_busses_for_route(&result)
-        ));*/
-        //Ok(response)
+        ));
+        println!("Bus positions: {:?}", response);
       },
       Err(err) => {
         println!("Error: {}", err);
-        //Err(error::Error::RequestFail)
       }
     }
   }
