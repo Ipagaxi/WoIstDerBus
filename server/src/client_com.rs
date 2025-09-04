@@ -46,6 +46,7 @@ async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> error::Resu
       let response = Json(json!(
         util_json::get_infos_of_all_busses_for_route(&result)
       ));
+      println!("Response for client: {:?}", response);
       Ok(response)
     },
     Err(err) => {

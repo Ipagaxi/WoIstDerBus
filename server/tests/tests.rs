@@ -1,9 +1,7 @@
 use std::fs;
 use serde_json::Value;
-use std::fs::File;
-use std::io::prelude::*;
 
-use server::{util_json, aseag_com, client_com, send_http_requests, error};
+use server::{util_json, aseag_com, client_com, send_http_requests};
 
 #[cfg(test)]
 mod tests {

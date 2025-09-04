@@ -15,7 +15,7 @@ pub struct BusPosition {
   y: u32
 }
 
-pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a Value> {
+pub fn get_value_by_path<'a>(json_data: &'a Value, path: &[&str]) -> Vec<&'a Value> {
     let mut current = json_data;
     let mut positions: Vec<&Value> = Vec::new();
     for mut i in 0..path.len() {

@@ -13,7 +13,8 @@ pub struct RequestBody {
     auth: Auth,
     client: Client,
     formatted: bool,
-    svcReqL: Vec<ServiceRequest>,
+    #[serde(rename = "svcReqL")]
+    svc_req_l: Vec<ServiceRequest>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -92,8 +93,10 @@ struct Profile {
 struct Location {
     lid: String,
     name: String,
-    globalIdL: Vec<GlobalId>,
-    eteId: String,
+    #[serde(rename = "globalIdL")]
+    global_id_l: Vec<GlobalId>,
+    #[serde(rename = "eteId")]
+    ete_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -118,24 +121,24 @@ pub fn construct_bus_route_request_body(bus_route_spec: client_com::BusRoutePayl
     let arr_location = Location {
         lid: bus_route_spec.arr_station.lid,
         name: bus_route_spec.arr_station.name.clone(),
-        globalIdL: vec![
+        global_id_l: vec![
             GlobalId {
                 id: format!("de:05334:{}", bus_route_spec.arr_station.ext_id),
                 id_type: "A".to_string()
             }
         ],
-        eteId: format!("arr_0|{}|{}|{}|{}|{}", bus_route_spec.arr_station.station_type, bus_route_spec.arr_station.name, bus_route_spec.arr_station.ext_id, bus_route_spec.arr_station.coord_x, bus_route_spec.arr_station.coord_y)
+        ete_id: format!("arr_0|{}|{}|{}|{}|{}", bus_route_spec.arr_station.station_type, bus_route_spec.arr_station.name, bus_route_spec.arr_station.ext_id, bus_route_spec.arr_station.coord_x, bus_route_spec.arr_station.coord_y)
     };
     let dep_location = Location {
         lid: bus_route_spec.dep_station.lid,
         name: bus_route_spec.dep_station.name.clone(),
-        globalIdL: vec![
+        global_id_l: vec![
             GlobalId {
                 id: format!("de:05334:{}", bus_route_spec.dep_station.ext_id),
                 id_type: "A".to_string()
             }
         ],
-        eteId: format!("dep_0|{}|{}|{}|{}|{}", bus_route_spec.dep_station.station_type, bus_route_spec.dep_station.name, bus_route_spec.dep_station.ext_id, bus_route_spec.dep_station.coord_x, bus_route_spec.dep_station.coord_y)
+        ete_id: format!("dep_0|{}|{}|{}|{}|{}", bus_route_spec.dep_station.station_type, bus_route_spec.dep_station.name, bus_route_spec.dep_station.ext_id, bus_route_spec.dep_station.coord_x, bus_route_spec.dep_station.coord_y)
     };
     let service_request = ServiceRequest {
         meth: "TripSearch".to_string(),
@@ -223,7 +226,7 @@ pub fn construct_bus_route_request_body(bus_route_spec: client_com::BusRoutePayl
         auth: auth,
         client: client,
         formatted: false,
-        svcReqL: vec![service_request],
+        svc_req_l: vec![service_request],
     }
 }
 
