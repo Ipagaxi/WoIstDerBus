@@ -152,6 +152,12 @@ pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusData> 
       }
     }
   }
+  let example_bus_data = BusData {
+    name: "66".to_string(),
+    direction_text: "Nach Hause".to_string(),
+    pos: BusPosition { x: 6189221, y: 51777163 }
+  };
+  bus_data_vec.push(example_bus_data);
   bus_data_vec
 
   /*
