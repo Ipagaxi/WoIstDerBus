@@ -71,9 +71,9 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
 
 fn get_bus_name(info_string: &str) -> &str {
   // hay example: "T$A=1@O=Aachen, Bushof@L=1001@a=128@$A=1@O=Aachen, Halifaxstraße@L=1427@a=128@$202509041222$202509041232$Bus   73$$1$$$$$$"
-  let re = Regex::new(r"(?<=(\$Bus\s*))\w+").unwrap();
-  if let Some(m) = re.find(info_string) {
-        &info_string[m.start()..m.end()]
+  let re = Regex::new(r"\$Bus\s*([^\$]+)").unwrap();
+  if let Some(caps) = re.captures(info_string) {
+        caps.get(1).map_or("None", |m| &info_string[m.start()..m.end()])
   } else { 
     println!("No regex captures found");
     "None"
@@ -115,7 +115,7 @@ fn parse_bus_direction(json_property_value: &Value) -> &str {
     match direction_value.as_str() {
       Some(direction_str) => direction_str,
       None => {
-        println!("Property 'dirTxt' found, but it is not a string?!")
+        println!("Property 'dirTxt' found, but it is not a string?!");
         "N/A"
       }
     }
