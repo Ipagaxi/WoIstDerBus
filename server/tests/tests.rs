@@ -33,8 +33,8 @@ use super::*;
     match fs::read_to_string("tests/BusDataJson.json") {
       Ok(json_data) => {
         let parsed_json: Value = serde_json::from_str(&json_data).expect("Failed to parse JSON");
-        let path_string = vec!["svcResL", "res", "outConL", "secL", "jny", "pos"];
-        let result = util_json::get_value_by_path(&parsed_json, &path_string);
+        let json_path = vec!["svcResL", "res", "outConL", "secL", "jny", "pos"];
+        let result = util_json::get_value_by_path(&parsed_json, &json_path);
         println!("result: {:?}", result);
         assert_eq!(*result[0], json!({"x": 6063026, "y": 50769978}));
         assert_eq!(*result[1], json!({"x": 6121609, "y": 50780199}));

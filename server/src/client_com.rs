@@ -42,6 +42,7 @@ async fn request_bus_routes(Json(payload): Json<BusRoutePayload>) -> error::Resu
   let body = aseag_com::construct_bus_route_request_body(payload);
   match send_http_requests::send_get_request(url, body).await {
     Ok(result) => {
+      
       let response = Json(json!(
         util_json::get_infos_of_all_busses_for_route(&result)
       ));

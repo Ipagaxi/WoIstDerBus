@@ -34,8 +34,6 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
               }
             }
         } else {
-            // Just a regular key
-
             match current.get(&path[i]) {
               Some(value) => {
                 // If an index is not specified => go through every
@@ -47,6 +45,7 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
                     i = path.len();
 
                   } else {
+                    // Just a regular key
                     current = value;
                   } 
                 } else {
@@ -63,12 +62,26 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &Vec<&str>) -> Vec<&'a 
     positions
 }
 
-/*pub fn get_infos_of_all_busses_for_route<'a>(json_data: &'a Value) -> BusPosition {
+pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusPosition> {
+  let route_data_value: Value = serde_json::from_str(route_data_json).expect("Failed to parse JSON");
 
-  let result = get_value_by_path(json_data, path)
-}*/
+  let json_path = vec!["svcResL", "res", "outConL", "secL", "jny", "pos"];
+  let value_bus_positions = get_value_by_path(&route_data_value, &json_path);
+  let mut bus_positions: Vec<BusPosition> = Vec::new();
+  for value_position in value_bus_positions {
+    match serde_json::from_value(value_position.clone()) {
+      Ok(position) => {
+        bus_positions.push(position);
+      },
+      Err(e) => {
+        println!("Error: {}", e);
+      },
+    }
+  }
+  bus_positions
+}
 
-pub fn get_infos_of_all_busses_for_route(json_data: &str) -> Vec<BusPosition> {
+pub fn get_infos_of_all_busses_for_route_(json_data: &str) -> Vec<BusPosition> {
 
     let parsed_json: Value = serde_json::from_str(json_data).expect("Failed to parse JSON");
     let mut positions: Vec<BusPosition> = Vec::new();
