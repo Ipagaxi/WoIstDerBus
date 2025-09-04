@@ -16,29 +16,44 @@
   } from '@tauri-apps/plugin-geolocation'
 
   import { coords, getLocation, getBusRoute, bus_position } from '$lib/utils.ts';
-  import { type GetPositionResponse, type Position } from '$lib/utils.ts';
-  import BusRoutes from "./BusRoutes.svelte";
+  import { type GetBusDataResponse, type BusData } from '$lib/utils.ts';
 
   let log = "";
 
   let map;
   let userMarker;
   let bus_circle;
+  let greenBus;
+  let redBus;
+
+  var greenBusIcon = L.icon({
+    iconUrl: '/icons/bus_green.png',
+
+    iconSize:     [32, 32], // size of the icon
+  });
+
+  var redBusIcon = L.icon({
+    iconUrl: '/icons/bus_red.png',
+
+    iconSize:     [32, 32], // size of the icon
+  });
 
   onMount(() => {
 
     getLocation()
 
     // Initialize the map with a temporary center
-    map = L.map('map').setView([50.0, 6.0], 16);
+    map = L.map('map').setView([50.775, 6.084], 16);
 
-    bus_circle = L.circle([50.0, 6.0], {
+    bus_circle = L.circle([50.775, 6.084], {
       color: 'red',
       fillColor: '#f03',
       fillOpacity: 0.5,
       radius: 50
     }).addTo(map);
 
+    greenBus = L.marker([50.776, 6.084], {icon: greenBusIcon}).addTo(map);
+    redBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -54,14 +69,19 @@
   }
 
   const interval = setInterval(async () => {
-    const result = await getBusRoute() as GetPositionResponse;
+    const result = await getBusRoute() as BusData[];
+    console.log("Raw response: ", result);
     log = ""
     result.forEach(element => {
-      log += Math.trunc(element.x / 1)/1000000 + ", " + Math.trunc(element.y / 1)/1000000 + "\n";
+      if (element.name === "73") {
+        greenBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
+        //map.panTo([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
+      } else if (element.name === "33") {
+        redBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
+      }
+      log += element.name + " nach " + element.direction_text + ", " + Math.trunc(element.pos.x / 1)/1000000 + ", " + Math.trunc(element.pos.y / 1)/1000000 + "\n";
     });
-    
-    invoke('frontend_log', { message: '' + result});
-    map.panTo([bus_position.x, bus_position.y]);
+
     bus_circle.setLatLng([bus_position.x, bus_position.y]);
   }, 5000);
 
@@ -72,14 +92,13 @@
 </script>
 
 <div class="container">
-  <h1>Welcome to Tauri!</h1>
+  <h1>Wo ist eigentlich der Bus?!</h1>
 
   <div id="map"></div>
 
   <button on:click="{update_position}">
     Update position
   </button>
-  <BusRoutes/>
   <pre>Log: {log}</pre>
 </div>
 

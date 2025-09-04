@@ -13,8 +13,9 @@ let resp = 'None';
 let resp_status = 0;
 
 export type BusData = {
+  name: String;
+  direction_text: String;
   pos: Position;
-  number: String;
 }
 
 export type Position = {
@@ -110,12 +111,15 @@ export async function getBusRoute() {
           return `Request failed (${response.status}): ${errorBody}`;
         }
       }
+
+      const raw = await response.json();
+      console.log("Raw response from backend: ", raw);
+  
       
-      const bus_data = (await response.json()) as GetBusDataResponse;
+      const bus_data = raw as BusData[];
       console.log("Bus data", bus_data);
-      invoke('frontend_log', { message: 'Hello!' });
-      bus_position.y = Math.trunc(bus_data[0].x / 1)/1000000;
-      bus_position.x = Math.trunc(bus_data[0].y / 1)/1000000;
+      bus_position.y = Math.trunc(bus_data[0].pos.x / 1)/1000000;
+      bus_position.x = Math.trunc(bus_data[0].pos.y / 1)/1000000;
       console.log("Bus position (request): ", bus_position);
       resp = bus_position.x + ", " + bus_position.y;
       console.log(response.status); // e.g. 200
