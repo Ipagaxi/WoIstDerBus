@@ -39,13 +39,14 @@
     iconSize:     [32, 32], // size of the icon
   });
 
-  var blueBusIdon = L.icon({
+  var blueBusIcon = L.icon({
     iconUrl: '/icons/bus_blue.png',
 
     iconSize:     [32, 32], // size of the icon
   });
 
-  let busses: Layer[] = [];
+  let interval;
+  let busesLayer = L.layerGroup;
 
   onMount(() => {
 
@@ -61,14 +62,37 @@
       radius: 50
     }).addTo(map);
 
-    greenBus = L.marker([50.776, 6.084], {icon: greenBusIcon}).addTo(map);
+    /*greenBus = L.marker([50.776, 6.084], {icon: greenBusIcon}).addTo(map);
     redBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);
-    blueBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);
+    blueBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);*/
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
+
+    busesLayer = L.layerGroup().addTo(map);
+
+    interval = setInterval(async () => {
+      
+      const result = await getBusRoute() as BusData[];
+
+      busesLayer.clearLayers(); // nukes all previous markers
+
+      log = ""
+      result.forEach(element => {
+        const lat = element.pos.y / 1e6;
+        const lng = element.pos.x / 1e6;
+
+        let icon = undefined;
+        if (element.name === "73") icon = greenBusIcon;
+        else if (element.name === "33") icon = redBusIcon;
+        else if (element.name === "12") icon = blueBusIcon;
+
+        if (icon) L.marker([lat, lng], { icon }).addTo(busesLayer);
+        log += element.name + " nach " + element.direction_text + ": " + lat + ", " + lng + "\n";
+      });
+    }, 5000);
   });
 
   function update_position() {
@@ -77,29 +101,6 @@
     getLocation();
     map.panTo([coords.x, coords.y]);
   }
-
-  const interval = setInterval(async () => {
-    const result = await getBusRoute() as BusData[];
-    console.log("Raw response: ", result);
-    log = ""
-    busses.forEach(bus => {
-      bus.remove()
-    })
-    result.forEach(element => {
-      if (element.name === "73") {
-        busses += L.marker([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000], {icon: greenBusIcon}).addTo(map);//greenBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
-        //map.panTo([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
-      } else if (element.name === "33") {
-        busses += L.marker([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000], {icon: redBusIcon}).addTo(map);//redBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
-      }
-      else if (element.name === "33") {
-        busses += L.marker([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000], {icon: blueBusIcon}).addTo(map);//blueBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
-      }
-      log += element.name + " nach " + element.direction_text + ", " + Math.trunc(element.pos.x / 1)/1000000 + ", " + Math.trunc(element.pos.y / 1)/1000000 + "\n";
-    });
-
-    bus_circle.setLatLng([bus_position.x, bus_position.y]);
-  }, 5000);
 
   // Clean up when the component is destroyed
   onDestroy(() => {
