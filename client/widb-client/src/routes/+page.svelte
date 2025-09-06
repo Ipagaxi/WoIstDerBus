@@ -27,22 +27,22 @@
   let redBus;
   let blueBus;
 
-  var greenBusIcon = L.icon({
-    iconUrl: '/icons/bus_green.png',
-
-    iconSize:     [32, 32], // size of the icon
+  var greenBusIcon = new L.DivIcon({
+    className: 'my-div-icon',
+    html: '<span class="my-div-span">73</span>'+
+          '<img class="my-div-image" src="/icons/bus_green.png"/>'          
   });
 
-  var redBusIcon = L.icon({
-    iconUrl: '/icons/bus_red.png',
-
-    iconSize:     [32, 32], // size of the icon
+  var redBusIcon = new L.DivIcon({
+    className: 'my-div-icon',
+    html: '<span class="my-div-span">33</span>'+
+          '<img class="my-div-image" src="/icons/bus_red.png"/>'          
   });
 
-  var blueBusIcon = L.icon({
-    iconUrl: '/icons/bus_blue.png',
-
-    iconSize:     [32, 32], // size of the icon
+  var blueBusIcon = new L.DivIcon({
+    className: 'my-div-icon',
+    html: '<span class="my-div-span">12</span>'+
+          '<img class="my-div-image" src="/icons/bus_blue.png"/>'          
   });
 
   let interval;
