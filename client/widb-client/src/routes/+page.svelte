@@ -6,7 +6,7 @@
   import { onDestroy } from 'svelte';
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from 'svelte';
-  import L, { circle, type LeafletEvent } from 'leaflet';
+  import L, { circle, Layer, type LeafletEvent } from 'leaflet';
   import 'leaflet/dist/leaflet.css';
   import {
     checkPermissions,
@@ -25,6 +25,7 @@
   let bus_circle;
   let greenBus;
   let redBus;
+  let blueBus;
 
   var greenBusIcon = L.icon({
     iconUrl: '/icons/bus_green.png',
@@ -37,6 +38,14 @@
 
     iconSize:     [32, 32], // size of the icon
   });
+
+  var blueBusIdon = L.icon({
+    iconUrl: '/icons/bus_blue.png',
+
+    iconSize:     [32, 32], // size of the icon
+  });
+
+  let busses: Layer[] = [];
 
   onMount(() => {
 
@@ -54,6 +63,7 @@
 
     greenBus = L.marker([50.776, 6.084], {icon: greenBusIcon}).addTo(map);
     redBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);
+    blueBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -72,12 +82,18 @@
     const result = await getBusRoute() as BusData[];
     console.log("Raw response: ", result);
     log = ""
+    busses.forEach(bus => {
+      bus.remove()
+    })
     result.forEach(element => {
       if (element.name === "73") {
-        greenBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
+        busses += L.marker([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000], {icon: greenBusIcon}).addTo(map);//greenBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
         //map.panTo([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
       } else if (element.name === "33") {
-        redBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
+        busses += L.marker([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000], {icon: redBusIcon}).addTo(map);//redBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
+      }
+      else if (element.name === "33") {
+        busses += L.marker([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000], {icon: blueBusIcon}).addTo(map);//blueBus.setLatLng([Math.trunc(element.pos.y / 1)/1000000, Math.trunc(element.pos.x / 1)/1000000]);
       }
       log += element.name + " nach " + element.direction_text + ", " + Math.trunc(element.pos.x / 1)/1000000 + ", " + Math.trunc(element.pos.y / 1)/1000000 + "\n";
     });
