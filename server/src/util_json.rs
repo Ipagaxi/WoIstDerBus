@@ -4,11 +4,11 @@ use regex::Regex;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BusData {
-  name: String,
-  direction_text: String,
-  pos: BusPosition,
-  dep_time: u16,
-  arr_time: u16
+  pub name: String,
+  pub direction_text: String,
+  pub pos: BusPosition,
+  pub dep_time: u16,
+  pub arr_time: u16
 }
 
 #[derive(Debug, Serialize, Deserialize)] 
@@ -77,17 +77,19 @@ fn regex_bus_name(info_string: &str) -> &str {
   if let Some(caps) = re.captures(info_string) {
         caps.get(1).map_or("None", |m| &info_string[m.start()..m.end()])
   } else { 
-    println!("No regex captures found");
+    println!("No regex capture for bus name found");
     "None"
   }
 }
 
 fn regex_bus_dep_and_arr_time(info_string: &str) -> (u16, u16) {
-  let re = Regex::new(r"\$(\d{4})(\d{4})\$(\d{4})(\d{5})").unwrap();
+  let re = Regex::new(r"\$(\d{8})(\d{4})\$(\d{8})(\d{4})").unwrap();
   if let Some(caps) = re.captures(info_string) {
-        (caps.get(2).map_or("None", |m| &info_string[m.start()..m.end()]).parse::<u16>().unwrap(), caps.get(4).map_or("None", |m| &info_string[m.start()..m.end()]).parse::<u16>().unwrap())
+    let dep_time = caps.get(2).map_or("None", |m| &info_string[m.start()..m.end()]).parse::<u16>().unwrap();
+    let arr_time = caps.get(4).map_or("None", |m| &info_string[m.start()..m.end()]).parse::<u16>().unwrap();
+    (dep_time, arr_time)
   } else {
-    println!("No regex captures found");
+    println!("No regex capture for dep or arr time found");
     (0, 0)
   }
 }
@@ -110,8 +112,8 @@ fn parse_bus_name_and_dep_arr_time(json_property_value: &Value) -> (&str, u16, u
     match info_value.as_str() {
       Some(info_str) => {
         let name = regex_bus_name(info_str);
-        let (arr, dep) = regex_bus_dep_and_arr_time(info_str);
-        (name, arr, dep)
+        let (dep, arr) = regex_bus_dep_and_arr_time(info_str);
+        (name, dep, arr)
       },
       None => {
         println!("Property ctxRecon found, but it is not a string?!");
@@ -153,7 +155,7 @@ pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusData> 
           let pos = cast_pos_value_to_struct(pos_value.clone());
           
           // parse bus name/number e.g. "33"
-          let (name, arr_time, dep_time) = parse_bus_name_and_dep_arr_time(entry);
+          let (name, dep_time, arr_time) = parse_bus_name_and_dep_arr_time(entry);
           // parse bus direction text, e.g. "Uniklinik"
           let direction = parse_bus_direction(entry);
           let bus_data = BusData {

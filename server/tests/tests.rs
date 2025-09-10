@@ -82,4 +82,20 @@ use super::*;
     }
   }
 
+  #[test]
+  fn test_get_bus_data_from_json() {
+    match fs::read_to_string("tests/BusDataJson_2.json") {
+      Ok(json_data) => {
+        let bus_data = util_json::get_infos_of_all_busses_for_route(&json_data);
+        println!("result: {:?}", bus_data);
+        assert_eq!(bus_data[0].dep_time, 1728);
+        assert_eq!(bus_data[0].arr_time, 1738);
+        //assert_eq!(*result[1], json!({"x": 6121609, "y": 50780199}));
+      },
+      Err(why) => {
+        println!("Could not read 'example.json'! ({:?})", why);
+      },
+    }
+  }
+
 }
