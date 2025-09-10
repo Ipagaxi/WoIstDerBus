@@ -6,7 +6,9 @@ use regex::Regex;
 pub struct BusData {
   name: String,
   direction_text: String,
-  pos: BusPosition
+  pos: BusPosition,
+  dep_time: u16,
+  arr_time: u16
 }
 
 #[derive(Debug, Serialize, Deserialize)] 
@@ -69,7 +71,7 @@ pub fn get_value_by_path<'a>(json_data: &'a Value, path: &[&str]) -> Vec<&'a Val
     positions
 }
 
-fn get_bus_name(info_string: &str) -> &str {
+fn regex_bus_name(info_string: &str) -> &str {
   // hay example: "T$A=1@O=Aachen, Bushof@L=1001@a=128@$A=1@O=Aachen, Halifaxstraße@L=1427@a=128@$202509041222$202509041232$Bus   73$$1$$$$$$"
   let re = Regex::new(r"\$Bus\s*([^\$]+)").unwrap();
   if let Some(caps) = re.captures(info_string) {
@@ -77,6 +79,16 @@ fn get_bus_name(info_string: &str) -> &str {
   } else { 
     println!("No regex captures found");
     "None"
+  }
+}
+
+fn regex_bus_dep_and_arr_time(info_string: &str) -> (u16, u16) {
+  let re = Regex::new(r"\$(\d{4})(\d{4})\$(\d{4})(\d{5})").unwrap();
+  if let Some(caps) = re.captures(info_string) {
+        (caps.get(2).map_or("None", |m| &info_string[m.start()..m.end()]).parse::<u16>().unwrap(), caps.get(4).map_or("None", |m| &info_string[m.start()..m.end()]).parse::<u16>().unwrap())
+  } else {
+    println!("No regex captures found");
+    (0, 0)
   }
 }
 
@@ -93,20 +105,22 @@ fn cast_pos_value_to_struct(pos_value: Value) -> BusPosition {
   }
 }
 
-fn parse_bus_name(json_property_value: &Value) -> &str {
+fn parse_bus_name_and_dep_arr_time(json_property_value: &Value) -> (&str, u16, u16) {
   if let Some(info_value) = json_property_value.get("ctxRecon") {
     match info_value.as_str() {
       Some(info_str) => {
-        get_bus_name(info_str)
+        let name = regex_bus_name(info_str);
+        let (arr, dep) = regex_bus_dep_and_arr_time(info_str);
+        (name, arr, dep)
       },
       None => {
         println!("Property ctxRecon found, but it is not a string?!");
-        "None"
+        ("N/A", 0, 0)
       }
     }
   } else {
     println!("No info string with bus name found (ctxRecon)");
-    "None"
+    ("N/A", 0, 0)
   }
 }
 
@@ -139,13 +153,15 @@ pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusData> 
           let pos = cast_pos_value_to_struct(pos_value.clone());
           
           // parse bus name/number e.g. "33"
-          let name = parse_bus_name(&entry);
+          let (name, arr_time, dep_time) = parse_bus_name_and_dep_arr_time(entry);
           // parse bus direction text, e.g. "Uniklinik"
-          let direction = parse_bus_direction(&entry);
+          let direction = parse_bus_direction(entry);
           let bus_data = BusData {
             name: name.to_string(),
             direction_text: direction.to_string(),
-            pos
+            pos,
+            dep_time,
+            arr_time
           };
           bus_data_vec.push(bus_data);
         }
@@ -154,8 +170,10 @@ pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusData> 
   }
   let example_bus_data = BusData {
     name: "66".to_string(),
-    direction_text: "Nach Hause".to_string(),
-    pos: BusPosition { x: 6189221, y: 51777163 }
+    direction_text: "XY".to_string(),
+    pos: BusPosition { x: 6189221, y: 51777163 },
+    dep_time: 1200,
+    arr_time: 1220
   };
   bus_data_vec.push(example_bus_data);
   bus_data_vec
