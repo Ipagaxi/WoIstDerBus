@@ -1,0 +1,87 @@
+name: http://127.0.0.1:3000/bus_route
+description: |-
+  Imported from curl at 2025-03-02 15:46:20:
+  curl "http://127.0.0.1:3000/bus_route" -X POST -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" -H "Accept-Language: de,en-US;q=0.7,en;q=0.3" -H "Accept-Encoding: gzip, deflate, br, zstd" -H "DNT: 1" -H "Connection: keep-alive" -H "Upgrade-Insecure-Requests: 1" -H "Sec-Fetch-Dest: document" -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Site: same-origin" -H "Sec-Fetch-User: ?1" -H "Priority: u=0, i" -H "Content-Type: application/json" -H "Origin: http://127.0.0.1:3000" -H "Pragma: no-cache" -H "Cache-Control: no-cache" --data-raw "{"^
+
+  "  ""arr_station"": {"^
+
+  "    ""name"": ""Central Station"","^
+
+  "    ""lid"": ""12345"","^
+
+  "    ""type"": ""bus"","^
+
+  "    ""ext_id"": ""67890"""^
+
+  "  },"^
+
+  "  ""des_station"": {"^
+
+  "    ""name"": ""Downtown Station"","^
+
+  "    ""lid"": ""54321"","^
+
+  "    ""type"": ""metro"","^
+
+  "    ""ext_id"": ""09876"""^
+
+  "  }"^
+
+  "}"
+method: POST
+url: http://127.0.0.1:3000/bus_route
+body:
+  content: |-
+    {
+      "out_frwd": true,
+      "arr_station": {
+        "name": "Halifaxstraße",
+        "lid": "A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1739229385@",
+        "type": "S",
+        "ext_id": "1427",
+        "coord_x": 6058001,
+        "coord_y": 50779534
+      },
+      "dep_station": {
+        "name": "Bushof, AC",
+        "lid": "A=1@O=Bushof, AC@X=6089661@Y=50776477@U=80@L=1001@B=1@p=1740697285@",
+        "type": "S",
+        "ext_id": "1001",
+        "coord_x": 6089661,
+        "coord_y": 50776477
+      }
+    }
+  content_type: application/json
+headers:
+- name: User-Agent
+  value: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0
+- name: Accept
+  value: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+- name: Accept-Language
+  value: de,en-US;q=0.7,en;q=0.3
+- name: Accept-Encoding
+  value: gzip, deflate, br, zstd
+- name: DNT
+  value: '1'
+- name: Connection
+  value: keep-alive
+- name: Upgrade-Insecure-Requests
+  value: '1'
+- name: Sec-Fetch-Dest
+  value: document
+- name: Sec-Fetch-Mode
+  value: navigate
+- name: Sec-Fetch-Site
+  value: same-origin
+- name: Sec-Fetch-User
+  value: ?1
+- name: Priority
+  value: u=0, i
+- name: Content-Type
+  value: application/json
+- name: Origin
+  value: http://127.0.0.1:3000
+- name: Pragma
+  value: no-cache
+- name: Cache-Control
+  value: no-cache

@@ -1,0 +1,109 @@
+{
+    "auth": {
+        "aid": "4vV1PaulHallo511icH",
+        "type": "AID"
+    },
+    "client": {
+        "id": "AVV_AACHEN",
+        "l": "vs_aseag",
+        "name": "webapp",
+        "type": "WEB",
+        "v": 20500
+    },
+    "formatted": false,
+    "id": "pcksfne2kwgmwk8x",
+    "lang": "deu",
+    "svcReqL": [
+        {
+            "id": "1|33|",
+            "meth": "TripSearch",
+            "req": {
+                "arrLocL": [
+                    {
+                        "eteId": "arr_0|S|Driescher Gässchen (RWTH Aachen), AC|1027|6081805|50779246",
+                        "globalIdL": [
+                            {
+                                "id": "de:05334:1027",
+                                "type": "A"
+                            }
+                        ],
+                        "lid": "A=1@O=Driescher Gässchen (RWTH Aachen), AC@X=6081805@Y=50779246@U=80@L=1027@B=1@p=1739229385@",
+                        "name": "Driescher Gässchen (RWTH Aachen), AC"
+                    }
+                ],
+                "depLocL": [
+                    {
+                        "eteId": "dep_0|S|Halifaxstraße|1427|6058001|50779534",
+                        "globalIdL": [
+                            {
+                                "id": "de:05334:1427",
+                                "type": "A"
+                            }
+                        ],
+                        "lid": "A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1739229385@",
+                        "name": "Halifaxstraße"
+                    }
+                ],
+                "getPasslist": true,
+                "getPolyline": true,
+                "gisFltrL": [
+                    {
+                        "mode": "FB",
+                        "profile": {
+                            "maxdist": "2000",
+                            "type": "F"
+                        },
+                        "type": "P"
+                    },
+                    {
+                        "meta": "foot_speed_normal",
+                        "mode": "FBT",
+                        "type": "M"
+                    },
+                    {
+                        "mode": "FB",
+                        "profile": {
+                            "maxdist": "5000",
+                            "type": "B"
+                        },
+                        "type": "P"
+                    },
+                    {
+                        "meta": "bike_speed_normal",
+                        "mode": "FBT",
+                        "type": "M"
+                    },
+                    {
+                        "meta": "car_speed_normal",
+                        "mode": "FBT",
+                        "type": "M"
+                    }
+                ],
+                "jnyFltrL": [
+                    {
+                        "mode": "INC",
+                        "type": "GROUP",
+                        "value": "OEV"
+                    },
+                    {
+                        "meta": "notBarrierfree",
+                        "mode": "INC",
+                        "type": "META"
+                    },
+                    {
+                        "mode": "INC",
+                        "type": "PROD",
+                        "value": 2033
+                    }
+                ],
+                "liveSearch": false,
+                "maxChg": "1000",
+                "minChgTime": "-1",
+                "outDate": "20250211",
+                "outFrwd": true,
+                "outTime": "115000"
+            }
+        }
+    ],
+    "ver": "1.69"
+}
