@@ -1,5 +1,3 @@
-use std::{fmt::format, ops::Bound};
-
 use serde::{Serialize, Deserialize};
 
 use crate::client_com;
@@ -7,6 +5,7 @@ use crate::client_com;
 const JSON_BODY_EXAMPLE: &str = r#"{"id":"t5m4vn8qkw8iy44k","ver":"1.69","lang":"deu","auth":{"type":"AID","aid":"4vV1PaulHallo511icH"},"client":{"id":"AVV_AACHEN","type":"WEB","name":"webapp","l":"vs_aseag","v":20500},"formatted":false,"svcReqL":[{"meth":"TripSearch","req":{"jnyFltrL":[{"type":"GROUP","mode":"INC","value":"OEV"},{"type":"META","mode":"INC","meta":"notBarrierfree"},{"type":"PROD","mode":"INC","value":2033}],"getPolyline":true,"getPasslist":true,"gisFltrL":[{"type":"P","mode":"FB","profile":{"type":"F","maxdist":"2000"}},{"type":"M","mode":"FBT","meta":"foot_speed_normal"},{"type":"P","mode":"FB","profile":{"type":"B","maxdist":"5000"}},{"type":"M","mode":"FBT","meta":"bike_speed_normal"},{"type":"M","mode":"FBT","meta":"car_speed_normal"}],"depLocL":[{"lid":"A=1@O=Driescher Gässchen (RWTH Aachen), AC@X=6081805@Y=50779246@U=80@L=1027@B=1@p=1739229385@","name":"Driescher Gässchen (RWTH Aachen), AC","globalIdL":[{"id":"de:05334:1027","type":"A"}],"eteId":"dep_0|S|Driescher Gässchen (RWTH Aachen), AC|1027|6081805|50779246"}],"arrLocL":[{"lid":"A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1739229385@","name":"Halifaxstraße","globalIdL":[{"id":"de:05334:1427","type":"A"}],"eteId":"arr_0|S|Halifaxstraße|1427|6058001|50779534"}],"outFrwd":true,"outTime":"121000","outDate":"20250211","liveSearch":false,"maxChg":"1000","minChgTime":"-1"},"id":"1|25|"}]}"#;
 
 #[derive(Debug, Serialize, Deserialize)]
+
 pub struct RequestBody {
     id: String,
     ver: String,
@@ -14,7 +13,8 @@ pub struct RequestBody {
     auth: Auth,
     client: Client,
     formatted: bool,
-    svcReqL: Vec<ServiceRequest>,
+    #[serde(rename = "svcReqL")]
+    svc_req_l: Vec<ServiceRequest>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -93,8 +93,10 @@ struct Profile {
 struct Location {
     lid: String,
     name: String,
-    globalIdL: Vec<GlobalId>,
-    eteId: String,
+    #[serde(rename = "globalIdL")]
+    global_id_l: Vec<GlobalId>,
+    #[serde(rename = "eteId")]
+    ete_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -119,24 +121,24 @@ pub fn construct_bus_route_request_body(bus_route_spec: client_com::BusRoutePayl
     let arr_location = Location {
         lid: bus_route_spec.arr_station.lid,
         name: bus_route_spec.arr_station.name.clone(),
-        globalIdL: vec![
+        global_id_l: vec![
             GlobalId {
                 id: format!("de:05334:{}", bus_route_spec.arr_station.ext_id),
                 id_type: "A".to_string()
             }
         ],
-        eteId: format!("arr_0|{}|{}|{}|{}|{}", bus_route_spec.arr_station.station_type, bus_route_spec.arr_station.name, bus_route_spec.arr_station.ext_id, bus_route_spec.arr_station.coord_x, bus_route_spec.arr_station.coord_y)
+        ete_id: format!("arr_0|{}|{}|{}|{}|{}", bus_route_spec.arr_station.station_type, bus_route_spec.arr_station.name, bus_route_spec.arr_station.ext_id, bus_route_spec.arr_station.coord_x, bus_route_spec.arr_station.coord_y)
     };
     let dep_location = Location {
         lid: bus_route_spec.dep_station.lid,
         name: bus_route_spec.dep_station.name.clone(),
-        globalIdL: vec![
+        global_id_l: vec![
             GlobalId {
                 id: format!("de:05334:{}", bus_route_spec.dep_station.ext_id),
                 id_type: "A".to_string()
             }
         ],
-        eteId: format!("dep_0|{}|{}|{}|{}|{}", bus_route_spec.dep_station.station_type, bus_route_spec.dep_station.name, bus_route_spec.dep_station.ext_id, bus_route_spec.dep_station.coord_x, bus_route_spec.dep_station.coord_y)
+        ete_id: format!("dep_0|{}|{}|{}|{}|{}", bus_route_spec.dep_station.station_type, bus_route_spec.dep_station.name, bus_route_spec.dep_station.ext_id, bus_route_spec.dep_station.coord_x, bus_route_spec.dep_station.coord_y)
     };
     let service_request = ServiceRequest {
         meth: "TripSearch".to_string(),
@@ -224,12 +226,11 @@ pub fn construct_bus_route_request_body(bus_route_spec: client_com::BusRoutePayl
         auth: auth,
         client: client,
         formatted: false,
-        svcReqL: vec![service_request],
+        svc_req_l: vec![service_request],
     }
 }
 
 pub fn load_template_request_body() -> Result<RequestBody, serde_json::Error> {
-    print!("start loading");
     let request_body: RequestBody = serde_json::from_str(JSON_BODY_EXAMPLE)?;
     Ok(request_body)
 }

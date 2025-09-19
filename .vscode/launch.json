@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "cargo": {
+                "args": ["test", "--manifest-path", "${workspaceFolder}/server/Cargo.toml", "--",  "--show-output",],  // compile tests, don't run immediately
+            },
+            "program": "${cargo:program}", // VSCode-Rust will replace this with compiled test binary
+            "stopOnEntry": false,
+            "sourceLanguages": ["rust"],
+            "args": [],
+            "cwd": "${workspaceFolder}/server"
+        }
+    ]
+}

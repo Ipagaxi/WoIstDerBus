@@ -1,18 +1,12 @@
 use axum::{
-    extract::Query, handler, response::{Html, IntoResponse}, routing::{get, post}, Router
+    Router
 };
 use serde::Deserialize;
+use tower_http::cors::{Any, CorsLayer};
 
-pub use self::error::{Error, Result};
+pub use server::error::{Error, Result};
 
-pub mod client_com;
-pub mod aseag_com;
-pub mod send_http_requests;
-mod error;
-
-use crate::client_com::*;
-use crate::aseag_com::*;
-use crate::send_http_requests::*;
+use server::client_com;
 
 #[derive(Debug, Deserialize)]
 struct Params {
@@ -21,7 +15,14 @@ struct Params {
 
 #[tokio::main]
 async fn main() {
-    let routes_all = Router::new().merge(client_com_routes());
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
+    let routes_all = Router::new()
+        .merge(client_com::client_com_routes())
+        .layer(cors);
 
     let url = "0.0.0.0";
     let port = "3000";
