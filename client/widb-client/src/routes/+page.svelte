@@ -5,7 +5,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { invoke } from "@tauri-apps/api/core";
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import L, { circle, Layer, type LeafletEvent } from 'leaflet';
   import 'leaflet/dist/leaflet.css';
   import {
@@ -48,12 +48,12 @@
   let interval;
   let busesLayer = L.layerGroup;
 
-  onMount(() => {
-
+  onMount(async () => {
+    await tick();
     getLocation()
 
     // Initialize the map with a temporary center
-    map = L.map('map').setView([50.775, 6.084], 16);
+    map = L.map('map', {preferCanvas: false}).setView([50.775, 6.084], 16);
 
     bus_circle = L.circle([50.775, 6.084], {
       color: 'red',
@@ -69,9 +69,16 @@
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
+      subdomains: ['a', 'b', 'c'],
+      crossOrigin: true
     }).addTo(map);
 
     busesLayer = L.layerGroup().addTo(map);
+
+    map.invalidateSize();
+
+    const resizeHandler = () => map.invalidateSize();
+    window.addEventListener('resize', resizeHandler);
 
     interval = setInterval(async () => {
       
@@ -120,7 +127,10 @@
 </div>
 
 <style>
-  #map { height: 180px; }
+  #map { 
+    height: 180px;
+    min-height: 180px;
+  }
 
   .logo.vite:hover {
     filter: drop-shadow(0 0 2em #747bff);
