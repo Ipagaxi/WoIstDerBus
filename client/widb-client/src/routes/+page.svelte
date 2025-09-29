@@ -21,11 +21,7 @@
   let log = "";
 
   let map;
-  let userMarker;
-  let bus_circle;
-  let greenBus;
-  let redBus;
-  let blueBus;
+  let pos_circle;
 
   var greenBusIcon = new L.DivIcon({
     className: 'my-div-icon',
@@ -50,21 +46,11 @@
 
   onMount(async () => {
     await tick();
-    getLocation()
 
     // Initialize the map with a temporary center
     map = L.map('map', {preferCanvas: false}).setView([50.775, 6.084], 16);
 
-    bus_circle = L.circle([50.775, 6.084], {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5,
-      radius: 50
-    }).addTo(map);
-
-    /*greenBus = L.marker([50.776, 6.084], {icon: greenBusIcon}).addTo(map);
-    redBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);
-    blueBus = L.marker([50.774, 6.084], {icon: redBusIcon}).addTo(map);*/
+    show_position();
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -84,7 +70,7 @@
       
       const result = await getBusRoute() as BusData[];
 
-      busesLayer.clearLayers(); // nukes all previous markers
+      busesLayer.clearLayers();
 
       log = ""
       result.forEach(element => {
@@ -99,17 +85,37 @@
         if (icon) L.marker([lat, lng], { icon }).addTo(busesLayer);
         log += element.name + " nach " + element.direction_text + ": " + lat + ", " + lng + "\n";
       });
+      
     }, 5000);
   });
 
-  function update_position() {
-    invoke('frontend_log', { message: '' + bus_position.x });
-    console.log("coords", coords);
-    getLocation();
-    map.panTo([coords.x, coords.y]);
+  async function show_position() {
+    if (await update_position()) {
+      map.panTo([coords.x, coords.y]);
+    }
   }
 
-  // Clean up when the component is destroyed
+  async function update_position() {
+    invoke('frontend_log', { message: '' + bus_position.x });
+    console.log("coords", coords);
+    let retrieved_location = await getLocation();
+    if (retrieved_location) {
+      if (pos_circle) {
+        pos_circle.setLatLng([coords.x, coords.y]);
+      } else {
+        pos_circle = L.circle([coords.x, coords.y], {
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: 0.5,
+          radius: 50
+        }).addTo(map);
+      }
+    } else {
+      //pos_circle = undefined;
+    }
+    return retrieved_location;
+  }
+
   onDestroy(() => {
     clearInterval(interval);
   });

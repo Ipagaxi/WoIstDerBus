@@ -56,11 +56,14 @@ export async function getLocation() {
           console.log('Updated Position:', pos);
         }
       );
+      return true;
     } else {
       console.error('Location permission denied');
+      return false;
     }
   } catch (error) {
     console.error('Error getting location:', error);
+    return false;
   }
 }
 

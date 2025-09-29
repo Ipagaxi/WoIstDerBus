@@ -20,6 +20,7 @@
     "axios": "^1.8.4",
     "internal-ip": "^8.0.0",
     "leaflet": "^1.9.4",
+    "widb-client": ".",
     "zod": "^3.24.2"
   },
   "devDependencies": {
