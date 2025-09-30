@@ -17,6 +17,7 @@
 
   import { coords, getLocation, getBusRoute, bus_position } from '$lib/utils.ts';
   import { type GetBusDataResponse, type BusData } from '$lib/utils.ts';
+  import busIcon from "$lib/icons/bus.svg?raw";
 
   let log = "";
 
@@ -26,19 +27,19 @@
   var greenBusIcon = new L.DivIcon({
     className: 'my-div-icon',
     html: '<span class="my-div-span">73</span>'+
-          '<img class="my-div-image" src="/icons/bus_green.png"/>'          
+          '<img class="my-div-image" src="/icons/bus.svg" width="32px"/>'          
   });
 
   var redBusIcon = new L.DivIcon({
     className: 'my-div-icon',
     html: '<span class="my-div-span">33</span>'+
-          '<img class="my-div-image" src="/icons/bus_red.png"/>'          
+          '<img class="my-div-image" src="/icons/bus.svg" width="32px"/>'          
   });
 
   var blueBusIcon = new L.DivIcon({
     className: 'my-div-icon',
     html: '<span class="my-div-span">12</span>'+
-          '<img class="my-div-image" src="/icons/bus_blue.png"/>'          
+          '<img class="my-div-image" src="/icons/bus.svg" width="32px"/>'          
   });
 
   let interval;
@@ -73,7 +74,7 @@
       busesLayer.clearLayers();
 
       log = ""
-      result.forEach(element => {
+      result.forEach(async (element) => {
         const lat = element.pos.y / 1e6;
         const lng = element.pos.x / 1e6;
 
@@ -82,12 +83,50 @@
         else if (element.name === "33") icon = redBusIcon;
         else if (element.name === "12") icon = blueBusIcon;
 
-        if (icon) L.marker([lat, lng], { icon }).addTo(busesLayer);
+        //if (icon) L.marker([lat, lng], { icon }).addTo(busesLayer);
+        icon = L.divIcon({
+          html: `<div class="bus-icon-${element.name}" style="--bus-color: blue;">${busIcon}</div>`,
+          className: "",
+          iconSize: [32, 32],
+        });
+        L.marker([lat, lng], { icon }).addTo(busesLayer);
+        const rect = document.querySelector(`.bus-icon-${element.name} rect`);
+        if (rect) {
+          console.log("There is a rect: ", rect);
+          //rect.setAttribute("fill", "blue");
+          rect.style.fill="blue";
+        }
+
         log += element.name + " nach " + element.direction_text + ": " + lat + ", " + lng + "\n";
       });
       
     }, 5000);
   });
+
+  function bus_id_to_color(bus_id: String) {
+
+  }
+
+  function provide_bus_icon_for_route(bus_id: String): Promise<L.DivIcon> {
+    return fetch("/icons/bus.svg.svg")
+    .then(res => res.text())
+    .then(data => {
+      console.log("svg: ", data);
+      const svg = new DOMParser()
+        .parseFromString(data, "image/svg+xml")
+        .documentElement;
+
+      // Optional: modify SVG before using it
+      //svg.querySelector("g.rect.style")?.setAttribute("fill", "blue");
+
+      // Create Leaflet divIcon with the SVG
+      return L.divIcon({
+        html: svg.outerHTML,   // inject SVG markup
+        className: "",         // prevent Leaflet default styles
+        iconSize: [40, 40],    // adjust size
+      });
+    });
+  }
 
   async function show_position() {
     if (await update_position()) {
