@@ -79,22 +79,17 @@
         const lng = element.pos.x / 1e6;
 
         let icon = undefined;
-        if (element.name === "73") icon = greenBusIcon;
-        else if (element.name === "33") icon = redBusIcon;
-        else if (element.name === "12") icon = blueBusIcon;
 
-        //if (icon) L.marker([lat, lng], { icon }).addTo(busesLayer);
         icon = L.divIcon({
-          html: `<div class="bus-icon-${element.name}" style="--bus-color: blue;">${busIcon}</div>`,
-          className: "",
+          html: busIcon,
+          className: `bus-icon-${element.name}`,
           iconSize: [32, 32],
         });
         L.marker([lat, lng], { icon }).addTo(busesLayer);
         const rect = document.querySelector(`.bus-icon-${element.name} rect`);
         if (rect) {
-          console.log("There is a rect: ", rect);
-          //rect.setAttribute("fill", "blue");
-          rect.style.fill="blue";
+          let color = bus_id_to_color(element.name);
+          rect.style.fill=color;
         }
 
         log += element.name + " nach " + element.direction_text + ": " + lat + ", " + lng + "\n";
@@ -104,28 +99,18 @@
   });
 
   function bus_id_to_color(bus_id: String) {
-
-  }
-
-  function provide_bus_icon_for_route(bus_id: String): Promise<L.DivIcon> {
-    return fetch("/icons/bus.svg.svg")
-    .then(res => res.text())
-    .then(data => {
-      console.log("svg: ", data);
-      const svg = new DOMParser()
-        .parseFromString(data, "image/svg+xml")
-        .documentElement;
-
-      // Optional: modify SVG before using it
-      //svg.querySelector("g.rect.style")?.setAttribute("fill", "blue");
-
-      // Create Leaflet divIcon with the SVG
-      return L.divIcon({
-        html: svg.outerHTML,   // inject SVG markup
-        className: "",         // prevent Leaflet default styles
-        iconSize: [40, 40],    // adjust size
-      });
-    });
+    var hash = 0;
+    if (bus_id.length === 0) return hash;
+    for (var i = 0; i < bus_id.length; i++) {
+        hash = bus_id.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    var color = '#';
+    for (var i = 0; i < 3; i++) {
+        var value = (hash >> (i * 8)) & 255;
+        color += ('00' + value.toString(16)).substr(-2);
+    }
+    return color;
   }
 
   async function show_position() {
