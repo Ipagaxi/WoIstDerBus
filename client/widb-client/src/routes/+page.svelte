@@ -22,7 +22,7 @@
   let log = "";
 
   let map;
-  let pos_circle;
+  let pos_marker;
 
   var greenBusIcon = new L.DivIcon({
     className: 'my-div-icon',
@@ -124,18 +124,13 @@
     console.log("coords", coords);
     let retrieved_location = await getLocation();
     if (retrieved_location) {
-      if (pos_circle) {
-        pos_circle.setLatLng([coords.x, coords.y]);
+      if (pos_marker) {
+        pos_marker.setLatLng([coords.x, coords.y]);
       } else {
-        pos_circle = L.circle([coords.x, coords.y], {
-          color: 'red',
-          fillColor: '#f03',
-          fillOpacity: 0.5,
-          radius: 50
-        }).addTo(map);
+        pos_marker = L.marker([coords.x, coords.y]).addTo(map);
       }
     } else {
-      //pos_circle = undefined;
+      //pos_marker = undefined;
     }
     return retrieved_location;
   }
