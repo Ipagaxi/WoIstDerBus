@@ -31,6 +31,16 @@ export let bus_position = { x: 0, y: 0}
 
 export let coords = { x: 0, y: 0};
 
+const arr_station = {
+  pos_x: 6058001,
+  pos_y: 50779534
+};
+
+const dep_station = {
+  pos_x: 6077841,
+  pos_y: 50781709
+};
+
 export async function getLocation() {
   console.log("get location")
   try {
@@ -80,16 +90,16 @@ export async function getBusRoute() {
         "lid": "A=1@O=Halifaxstraße@X=6058001@Y=50779534@U=80@L=1427@B=1@p=1749593764@i=A×de:05334:1427@",
         "type": "A",
         "ext_id": "1427",
-        "coord_x": 6058001,
-        "coord_y": 50779534
+        "coord_x": ${arr_station.pos_x},
+        "coord_y": ${arr_station.pos_y}
       },
       "dep_station": {
         "name": "Ponttor, AC",
         "lid": "A=1@O=Ponttor, AC@X=6077841@Y=50781709@U=80@L=1055@B=1@p=1749593764@i=A×de:05334:1055@",
         "type": "A",
         "ext_id": "1055",
-        "coord_x": 6077841,
-        "coord_y": 50781709
+        "coord_x": ${dep_station.pos_x},
+        "coord_y": ${dep_station.pos_y}
       }
     }`
     try {

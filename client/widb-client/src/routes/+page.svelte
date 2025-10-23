@@ -15,7 +15,7 @@
     watchPosition
   } from '@tauri-apps/plugin-geolocation'
 
-  import { coords, getLocation, getBusRoute, bus_position } from '$lib/utils.ts';
+  import { coords, getLocation, getBusRoute, bus_position} from '$lib/utils.ts';
   import { type GetBusDataResponse, type BusData } from '$lib/utils.ts';
   import busIcon from "$lib/icons/bus.svg?raw";
 
@@ -23,6 +23,16 @@
 
   let map;
   let pos_marker;
+
+  const arr_station = {
+    pos_x: 50.779534,
+    pos_y: 6.058001
+  };
+
+  const dep_station = {
+    pos_x: 50.781709,
+    pos_y: 6.077841
+  };
 
   var greenBusIcon = new L.DivIcon({
     className: 'my-div-icon',
@@ -59,6 +69,9 @@
       subdomains: ['a', 'b', 'c'],
       crossOrigin: true
     }).addTo(map);
+
+    var arr_station_marker = L.marker([arr_station.pos_x, arr_station.pos_y]).addTo(map);
+    var dep_station_marker = L.marker([dep_station.pos_x, dep_station.pos_y]).addTo(map);
 
     busesLayer = L.layerGroup().addTo(map);
 
