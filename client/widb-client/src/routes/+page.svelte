@@ -8,6 +8,7 @@
   import { onMount, tick } from 'svelte';
   import L, { circle, Layer, type LeafletEvent } from 'leaflet';
   import 'leaflet/dist/leaflet.css';
+  import 'polyline-encoded/Polyline.encoded.js'
   import {
     checkPermissions,
     requestPermissions,
@@ -80,11 +81,16 @@
     const resizeHandler = () => map.invalidateSize();
     window.addEventListener('resize', resizeHandler);
 
+    let encoded = "sp|tH{hed@e@GBFo@V_AXAG@FwBt@mHjOO@??NAiHtOMfAQ|ICbOKC??JBs@bI@xBp@hKvBnJRVh@`BMN??LOtD~Hh@j@G^??F_@|An@k@lDmEnIZ`@j@bAx@T?T???U\\Lz@tA\\`AFhAkBzKWt@ENIE??HD[v@GVsBhGmChMCGNa@";
+    let polyline = L.Polyline.fromEncoded(encoded);
+
     interval = setInterval(async () => {
       
       const result = await getBusRoute() as BusData[];
 
       busesLayer.clearLayers();
+
+      console.log("Polyline: ", polyline.getLatLngs());
 
       log = ""
       result.forEach(async (element) => {

@@ -16,6 +16,7 @@ export type BusData = {
   name: String;
   direction_text: String;
   pos: Position;
+  polyline: number[][]
 }
 
 export type Position = {
