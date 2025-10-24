@@ -8,7 +8,8 @@ pub struct BusData {
   pub direction_text: String,
   pub pos: BusPosition,
   pub dep_time: u16,
-  pub arr_time: u16
+  pub arr_time: u16,
+  pub poly_line: String
 }
 
 #[derive(Debug, Serialize, Deserialize)] 
@@ -141,32 +142,43 @@ fn parse_bus_direction(json_property_value: &Value) -> &str {
   }
 }
 
-pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusData> {
-  let route_data_value: Value = serde_json::from_str(route_data_json).expect("Failed to parse JSON");
+fn get_encoded_poly_lines(routes_data_value: &Value) -> Vec<String> {
+  let json_poly_l_path = vec!["svcResL", "res", "common", "polyL", "crdEncYX"];
+  let encoded_poly_lines_value = get_value_by_path(&routes_data_value, &json_poly_l_path);
+  let mut encoded_poly_lines_string: Vec<String> = Vec::new();
+  for poly in encoded_poly_lines_value {
+    encoded_poly_lines_string.push(poly.as_str().unwrap_or("").to_string());
+  }
+  encoded_poly_lines_string
+}
+
+pub fn get_infos_of_all_busses_for_route(routes_data_json: &str) -> Vec<BusData> {
+  let routes_data_value: Value = serde_json::from_str(&routes_data_json).expect("Failed to parse JSON");
 
   let mut bus_data_vec: Vec<BusData> = Vec::new();
   let json_jiny_l_path = vec!["svcResL", "res", "outConL", "secL", "jny", "freq", "jnyL"];
-  let value_jny_l_vec = get_value_by_path(&route_data_value, &json_jiny_l_path);
-  for jny_l_value in value_jny_l_vec {
+  let value_jny_l_vec = get_value_by_path(&routes_data_value, &json_jiny_l_path);
+  let encoded_poly_lines = get_encoded_poly_lines(&routes_data_value);
+  for (i, jny_l_value) in value_jny_l_vec.iter().enumerate() {
     if let Some(arr) = jny_l_value.as_array() {
       for entry in arr {
-        // Only parse busses that have a live position
+        // parse bus name/number e.g. "33" an departure and arrival time
+        let (name, dep_time, arr_time) = parse_bus_name_and_dep_arr_time(entry);
+        // parse bus direction text, e.g. "Uniklinik"
+        let direction = parse_bus_direction(entry);
+        let mut pos = BusPosition { x: 0, y: 0 };
         if let Some(pos_value) = entry.get("pos") {
-          let pos = cast_pos_value_to_struct(pos_value.clone());
-          
-          // parse bus name/number e.g. "33"
-          let (name, dep_time, arr_time) = parse_bus_name_and_dep_arr_time(entry);
-          // parse bus direction text, e.g. "Uniklinik"
-          let direction = parse_bus_direction(entry);
-          let bus_data = BusData {
-            name: name.to_string(),
-            direction_text: direction.to_string(),
-            pos,
-            dep_time,
-            arr_time
-          };
-          bus_data_vec.push(bus_data);
+          pos = cast_pos_value_to_struct(pos_value.clone());
         }
+        let bus_data = BusData {
+          name: name.to_string(),
+          direction_text: direction.to_string(),
+          pos,
+          dep_time,
+          arr_time,
+          poly_line: encoded_poly_lines[i].clone()
+        };
+        bus_data_vec.push(bus_data);
       }
     }
   }
@@ -175,25 +187,9 @@ pub fn get_infos_of_all_busses_for_route(route_data_json: &str) -> Vec<BusData> 
     direction_text: "XY".to_string(),
     pos: BusPosition { x: 6189221, y: 51777163 },
     dep_time: 1200,
-    arr_time: 1220
+    arr_time: 1220,
+    poly_line: "_h|tHkkdd@gCvADRg@n@MLoBdCy@|Bg@xIMC??LBGbAe@|FkB~JCnBl@lBLJXbAGF??FGVz@bArDZ`@kEpFi@b@gE@Ac@oB_Dk@|@AM??@L_@`B{@p@Bb@h@`BtD~Hh@j@G^??F_@|An@k@lDmEnIZ`@j@bAx@T?T???U\\Lz@tA\\`AFhAkBzKWt@ENIE??HD[v@GVl@r@PDpCbIhCjFrBbF~@pE\\bDID??HEH`EOrDS|AEhBaB`@uBvAi@l@EU]x@".to_string()
   };
   bus_data_vec.push(example_bus_data);
   bus_data_vec
-
-  /*
-  let json_path = vec!["svcResL", "res", "outConL", "secL", "jny", "freq", "jnyL", "pos"];
-  let value_bus_positions = get_value_by_path(&route_data_value, &json_path);
-  let mut bus_positions: Vec<BusPosition> = Vec::new();
-  for value_position in value_bus_positions {
-    match serde_json::from_value(value_position.clone()) {
-      Ok(position) => {
-        bus_positions.push(position);
-      },
-      Err(e) => {
-        println!("Error: {}", e);
-      },
-    }
-  }
-  bus_positions
-  */
 }
