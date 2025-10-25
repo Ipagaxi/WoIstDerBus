@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::value};
 use serde_json::Value;
 use regex::Regex;
 
@@ -142,6 +142,28 @@ fn parse_bus_direction(json_property_value: &Value) -> &str {
   }
 }
 
+fn parse_polyline_index(json_property_value: &Value) -> Option<u64> {
+  if let Some(polyline_g_value) = json_property_value.get("polyG") {
+    match polyline_g_value.get("polyXL") {
+      Some(polyline_indices_value) => {
+        match polyline_indices_value.as_array() {
+          Some(polyline_indices_array) => {
+            polyline_indices_array[0].as_u64()
+          },
+          None => None
+        }
+      },
+      None => {
+        println!("Property 'dirTxt' found, but it is not a string?!");
+        None
+      }
+    }
+  } else {
+    println!("No polyline group found (polyG)!");
+    None
+  }
+}
+
 fn get_encoded_poly_lines(routes_data_value: &Value) -> Vec<String> {
   let json_poly_l_path = vec!["svcResL", "res", "common", "polyL", "crdEncYX"];
   let encoded_poly_lines_value = get_value_by_path(&routes_data_value, &json_poly_l_path);
@@ -156,31 +178,33 @@ pub fn get_infos_of_all_busses_for_route(routes_data_json: &str) -> Vec<BusData>
   let routes_data_value: Value = serde_json::from_str(&routes_data_json).expect("Failed to parse JSON");
 
   let mut bus_data_vec: Vec<BusData> = Vec::new();
-  let json_jiny_l_path = vec!["svcResL", "res", "outConL", "secL", "jny", "freq", "jnyL"];
-  let value_jny_l_vec = get_value_by_path(&routes_data_value, &json_jiny_l_path);
+  let json_jny_path = vec!["svcResL", "res", "outConL", "secL", "jny"];
+  // It is a vec of all found "jny" in the whole document
+  let value_jny_vec = get_value_by_path(&routes_data_value, &json_jny_path);
   let encoded_poly_lines = get_encoded_poly_lines(&routes_data_value);
-  for (i, jny_l_value) in value_jny_l_vec.iter().enumerate() {
-    if let Some(arr) = jny_l_value.as_array() {
-      for entry in arr {
-        // parse bus name/number e.g. "33" an departure and arrival time
-        let (name, dep_time, arr_time) = parse_bus_name_and_dep_arr_time(entry);
-        // parse bus direction text, e.g. "Uniklinik"
-        let direction = parse_bus_direction(entry);
-        let mut pos = BusPosition { x: 0, y: 0 };
-        if let Some(pos_value) = entry.get("pos") {
-          pos = cast_pos_value_to_struct(pos_value.clone());
-        }
-        let bus_data = BusData {
-          name: name.to_string(),
-          direction_text: direction.to_string(),
-          pos,
-          dep_time,
-          arr_time,
-          poly_line: encoded_poly_lines[i].clone()
-        };
-        bus_data_vec.push(bus_data);
-      }
+  for jny_value in value_jny_vec {
+    // parse bus name/number e.g. "33" an departure and arrival time
+    let (name, dep_time, arr_time) = parse_bus_name_and_dep_arr_time(jny_value);
+    // parse bus direction text, e.g. "Uniklinik"
+    let direction = parse_bus_direction(jny_value);
+    let polyline_index_option = parse_polyline_index(jny_value);
+    let encoded_polyline = match polyline_index_option {
+      Some(index) => encoded_poly_lines[index as usize].clone(),
+      None => "".to_string()
+    };
+    let mut pos = BusPosition { x: 0, y: 0 };
+    if let Some(pos_value) = jny_value.get("pos") {
+      pos = cast_pos_value_to_struct(pos_value.clone());
     }
+    let bus_data = BusData {
+      name: name.to_string(),
+      direction_text: direction.to_string(),
+      pos,
+      dep_time,
+      arr_time,
+      poly_line: encoded_polyline
+    };
+    bus_data_vec.push(bus_data);
   }
   let example_bus_data = BusData {
     name: "66".to_string(),

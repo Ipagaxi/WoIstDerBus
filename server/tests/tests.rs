@@ -87,10 +87,11 @@ use super::*;
     match fs::read_to_string("tests/BusDataJson_2.json") {
       Ok(json_data) => {
         let bus_data = util_json::get_infos_of_all_busses_for_route(&json_data);
-        println!("result: {:?}", bus_data);
-        assert_eq!(bus_data[0].dep_time, 1728);
-        assert_eq!(bus_data[0].arr_time, 1738);
+        assert_eq!(bus_data[0].dep_time, 1722);
+        assert_eq!(bus_data[0].arr_time, 1732);
         assert_eq!(bus_data[0].poly_line, "_h|tHkkdd@gCvADRg@n@MLoBdCy@|Bg@xIMC??LBGbAe@|FkB~JCnBl@lBLJXbAGF??FGVz@bArDZ`@kEpFi@b@gE@Ac@oB_Dk@|@AM??@L_@`B{@p@Bb@h@`BtD~Hh@j@G^??F_@|An@k@lDmEnIZ`@j@bAx@T?T???U\\Lz@tA\\`AFhAkBzKWt@ENIE??HD[v@GVl@r@PDpCbIhCjFrBbF~@pE\\bDID??HEH`EOrDS|AEhBaB`@uBvAi@l@EU]x@");
+        // There are actually only 5 routes, the 6th is just an added example that has to be removed in the future
+        assert_eq!(bus_data.len(), 6);
         //assert_eq!(*result[1], json!({"x": 6121609, "y": 50780199}));
       },
       Err(why) => {
