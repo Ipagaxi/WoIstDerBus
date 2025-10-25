@@ -90,6 +90,7 @@ use super::*;
         println!("result: {:?}", bus_data);
         assert_eq!(bus_data[0].dep_time, 1728);
         assert_eq!(bus_data[0].arr_time, 1738);
+        assert_eq!(bus_data[0].poly_line, "_h|tHkkdd@gCvADRg@n@MLoBdCy@|Bg@xIMC??LBGbAe@|FkB~JCnBl@lBLJXbAGF??FGVz@bArDZ`@kEpFi@b@gE@Ac@oB_Dk@|@AM??@L_@`B{@p@Bb@h@`BtD~Hh@j@G^??F_@|An@k@lDmEnIZ`@j@bAx@T?T???U\\Lz@tA\\`AFhAkBzKWt@ENIE??HD[v@GVl@r@PDpCbIhCjFrBbF~@pE\\bDID??HEH`EOrDS|AEhBaB`@uBvAi@l@EU]x@");
         //assert_eq!(*result[1], json!({"x": 6121609, "y": 50780199}));
       },
       Err(why) => {
