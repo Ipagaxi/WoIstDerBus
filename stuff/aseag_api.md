@@ -3,6 +3,7 @@
 - It seems that the infos are not bundled under a route (the encoded polylines of a route is an json array somewhere in the json file)
 - The number of encoded polylines ("crdEncYX") is most likely the number of returned routes
   - When searching for 'ctxRecon' ("info string for route") there are (exactly) six times more entries than the number of encoded polylines
+- Each suggested route (jny) has further routes under "freq". These seem to correspond to the future repitions of that route and therefore, are less of interest for this project
 
 ## Requesting route from a -> b
 - To request that you want a connection now you just leave out outTime and outDate

@@ -1,0 +1,82 @@
+outConL [
+  {
+    secL [ // only one element
+      jny {
+        freq {
+          jnyL [
+            pos,
+            pos,
+            -,
+            -,
+            -
+          ]
+        },
+        pos
+      }
+    ]
+  },
+  {
+    secL [
+      jny {
+        freq {
+          jnyL [
+            pos,
+            -,
+            -,
+            -,
+            -
+          ]
+        },
+        pos // 5412
+      }
+    ]
+  },
+  {
+    secL [
+      jny {
+        freq {
+          jnyL [ // 6461
+            -,
+            -,
+            -,
+            -,
+            -
+          ]
+        },
+        pos
+      }
+    ]
+  },
+  {
+    secL [
+      jny {
+        freq {
+          jnyL [ //8110
+            -,
+            -,
+            -,
+            -,
+            -
+          ],
+          -
+        }
+      }
+    ]
+  },
+  {
+    secL [
+      jny {
+        freq {
+          jnyL [ //9608
+            -,
+            -,
+            -,
+            -,
+            -
+          ],
+          -
+        }
+      }
+    ]
+  },
+]
