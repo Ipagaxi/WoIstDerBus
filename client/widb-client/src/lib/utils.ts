@@ -38,8 +38,8 @@ const arr_station = {
 };
 
 const dep_station = {
-  pos_x: 6077841,
-  pos_y: 50781709
+  pos_x: 6075171,
+  pos_y: 50779866
 };
 
 export async function getLocation() {
@@ -95,10 +95,10 @@ export async function getBusRoute() {
         "coord_y": ${arr_station.pos_y}
       },
       "dep_station": {
-        "name": "Ponttor, AC",
-        "lid": "A=1@O=Ponttor, AC@X=6077841@Y=50781709@U=80@L=1055@B=1@p=1749593764@i=A×de:05334:1055@",
+        "name": "Audimax, AC",
+        "lid": "A=1@O=Audimax, AC@X=6075171@Y=50779866@U=80@L=1021@p=1762211516@i=A×de:05334:1021@",
         "type": "A",
-        "ext_id": "1055",
+        "ext_id": "1021",
         "coord_x": ${dep_station.pos_x},
         "coord_y": ${dep_station.pos_y}
       }

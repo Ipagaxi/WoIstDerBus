@@ -31,8 +31,8 @@
   };
 
   const dep_station = {
-    pos_x: 50.781709,
-    pos_y: 6.077841
+    pos_x: 50.779866,
+    pos_y: 6.075171
   };
 
   var greenBusIcon = new L.DivIcon({
@@ -94,24 +94,29 @@
 
       log = ""
       result.forEach(async (element) => {
-        const lat = element.pos.y / 1e6;
-        const lng = element.pos.x / 1e6;
+        let pos_string = "(No live position)";
+        if (element.pos.x != 0) {
+          const lat = element.pos.y / 1e6;
+          const lng = element.pos.x / 1e6;
+          pos_string = lat + ", " + lng;
 
-        let icon = undefined;
+          let icon = undefined;
 
-        icon = L.divIcon({
-          html: busIcon,
-          className: `bus-icon-${element.name}`,
-          iconSize: [32, 32],
-        });
-        L.marker([lat, lng], { icon }).addTo(busesLayer);
-        const rect = document.querySelector(`.bus-icon-${element.name} rect`);
-        if (rect) {
-          let color = bus_id_to_color(element.name);
-          rect.style.fill=color;
+          icon = L.divIcon({
+            html: busIcon,
+            className: `bus-icon-${element.name}`,
+            iconSize: [32, 32],
+          });
+          L.marker([lat, lng], { icon }).addTo(busesLayer);
+          const rect = document.querySelector(`.bus-icon-${element.name} rect`);
+          if (rect) {
+            let color = bus_id_to_color(element.name);
+            rect.style.fill=color;
+          }
         }
+        
 
-        log += element.name + " nach " + element.direction_text + ": " + lat + ", " + lng + "\n";
+        log += element.name + " nach " + element.direction_text + ": " + pos_string + "\n";
       });
       
     }, 5000);
