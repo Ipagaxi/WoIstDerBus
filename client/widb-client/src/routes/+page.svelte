@@ -6,7 +6,7 @@
   import { onDestroy } from 'svelte';
   import { invoke } from "@tauri-apps/api/core";
   import { onMount, tick } from 'svelte';
-  import L, { circle, Layer, type LeafletEvent } from 'leaflet';
+  import L, { circle, Layer, polyline, type LeafletEvent } from 'leaflet';
   import 'leaflet/dist/leaflet.css';
   import 'polyline-encoded/Polyline.encoded.js'
   import {
@@ -55,6 +55,7 @@
 
   let interval;
   let busesLayer = L.layerGroup;
+  let polyinesLayer = L.layerGroup;
 
   onMount(async () => {
     await tick();
@@ -75,26 +76,28 @@
     var dep_station_marker = L.marker([dep_station.pos_x, dep_station.pos_y]).addTo(map);
 
     busesLayer = L.layerGroup().addTo(map);
+    polyinesLayer = L.layerGroup().addTo(map);
 
     map.invalidateSize();
 
     const resizeHandler = () => map.invalidateSize();
     window.addEventListener('resize', resizeHandler);
 
-    let encoded = "sp|tH{hed@e@GBFo@V_AXAG@FwBt@mHjOO@??NAiHtOMfAQ|ICbOKC??JBs@bI@xBp@hKvBnJRVh@`BMN??LOtD~Hh@j@G^??F_@|An@k@lDmEnIZ`@j@bAx@T?T???U\\Lz@tA\\`AFhAkBzKWt@ENIE??HD[v@GVsBhGmChMCGNa@";
-    let polyline = L.Polyline.fromEncoded(encoded);
-
     interval = setInterval(async () => {
       
       const result = await getBusRoute() as BusData[];
 
-      busesLayer.clearLayers();
+      console.log("Before clear:", busesLayer.getLayers().length, polyinesLayer.getLayers().length);
 
-      console.log("Polyline: ", polyline.getLatLngs());
+      busesLayer.clearLayers();
+      polyinesLayer.clearLayers();
+
+      console.log("After clear:", busesLayer.getLayers().length, polyinesLayer.getLayers().length);
 
       log = ""
       result.forEach(async (element) => {
         let pos_string = "(No live position)";
+        let color = bus_id_to_color(element.name);
         if (element.pos.x != 0) {
           const lat = element.pos.y / 1e6;
           const lng = element.pos.x / 1e6;
@@ -103,18 +106,20 @@
           let icon = undefined;
 
           icon = L.divIcon({
-            html: busIcon,
+            html: `<span class="my-div-span">${element.name}</span>`+
+                  busIcon,
             className: `bus-icon-${element.name}`,
             iconSize: [32, 32],
           });
           L.marker([lat, lng], { icon }).addTo(busesLayer);
           const rect = document.querySelector(`.bus-icon-${element.name} rect`);
           if (rect) {
-            let color = bus_id_to_color(element.name);
+            
             rect.style.fill=color;
           }
         }
-        
+        let decoded_polyline = L.Polyline.fromEncoded(element.poly_line).getLatLngs();
+        let mapped_polyline = L.polyline(decoded_polyline, {color: color}).addTo(polyinesLayer);
 
         log += element.name + " nach " + element.direction_text + ": " + pos_string + "\n";
       });
@@ -122,7 +127,7 @@
     }, 5000);
   });
 
-  function bus_id_to_color(bus_id: String) {
+  function bus_id_to_color(bus_id: string): string {
     var hash = 0;
     if (bus_id.length === 0) return hash;
     for (var i = 0; i < bus_id.length; i++) {

@@ -8,6 +8,9 @@ import {
 
 import { invoke } from '@tauri-apps/api/core';
 import { fetch } from '@tauri-apps/plugin-http';
+import L from 'leaflet';
+import type { LatLng } from 'leaflet';
+import 'polyline-encoded/Polyline.encoded.js'
 
 let resp = 'None';
 let resp_status = 0;
@@ -76,6 +79,10 @@ export async function getLocation() {
     console.error('Error getting location:', error);
     return false;
   }
+}
+
+function getPolyline(encoded_polyline: String): LatLng[] {
+  let polyline = L.Polyline.fromEncoded(encoded_polyline).getLatLngs();
 }
 
 export async function getBusRoute() {
